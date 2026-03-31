@@ -145,7 +145,7 @@
       // Show prediction interval if available
       const intervalEl = document.getElementById('predicted-interval');
       if (intervalEl && result.score_low && result.score_high) {
-        intervalEl.textContent = `${result.score_low.toFixed(1)} – ${result.score_high.toFixed(1)}`;
+        intervalEl.textContent = I18n.t('ci-prefix') + `${result.score_low.toFixed(1)} – ${result.score_high.toFixed(1)}`;
         intervalEl.style.display = '';
       } else if (intervalEl) {
         intervalEl.style.display = 'none';
@@ -196,14 +196,14 @@
 
     container.innerHTML = `
       <div class="explore-header">
-        <strong>${data.base_variety}</strong> from ${data.base_country}
-        @ ${data.base_altitude}m — ${data.combinations} combinations tested
+        <strong>${data.base_variety}</strong> ${I18n.t('from-label')} ${data.base_country}
+        @ ${data.base_altitude}m — ${data.combinations} ${I18n.t('combinations-tested')}
       </div>
       <div class="explore-grid">
         ${data.results.slice(0, 12).map((r, i) => `
           <div class="explore-card ${i === 0 ? 'explore-best' : ''}">
             <span class="explore-method">${r.method.replace(/_/g, ' ')}${r.anaerobic ? ' (anaerobic)' : ''}</span>
-            <span class="explore-ferm">${r.fermentation_hours}h fermentation</span>
+            <span class="explore-ferm">${r.fermentation_hours}h ${I18n.t('fermentation-label')}</span>
             <span class="explore-score">${r.predicted_score}</span>
             <span class="explore-grade">${r.grade}</span>
           </div>
@@ -229,15 +229,15 @@
 
       // Show status
       const status = document.getElementById('pref-status');
-      status.textContent = 'Loading recommendations...';
+      status.textContent = I18n.t('loading-recommendations');
 
       // Fetch recommendations
       const result = await CoffeeScorer.recommend(prefs, 10);
       if (result && result.beans) {
         renderRecommendations(result.beans);
-        status.textContent = `Found ${result.beans.length} matches!`;
+        status.textContent = I18n.tf('found-matches', {n: result.beans.length});
       } else {
-        status.textContent = 'Saved!';
+        status.textContent = I18n.t('saved');
       }
       setTimeout(() => { status.textContent = ''; }, 3000);
     });
@@ -257,7 +257,7 @@
         </div>
         <span class="bean-score">${b.predicted_score}</span>
         <span class="bean-match" style="margin-left:0.5rem;font-size:0.8rem;color:var(--green)">
-          match: ${(b.pref_match * 100).toFixed(0)}%
+          ${I18n.t('match-label')}: ${(b.pref_match * 100).toFixed(0)}%
         </span>
       </div>
     `).join('');

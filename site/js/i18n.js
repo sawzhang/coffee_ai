@@ -79,11 +79,60 @@ const I18n = {
 
     // Footer
     'footer-text': { en: 'Coffee Attribution AutoResearch \u2014 Powered by', zh: '咖啡归因自动研究 \u2014 基于' },
+
+    // Select option translations
+    'opt-volcanic': { en: 'Volcanic', zh: '火山岩' },
+    'opt-clay': { en: 'Clay', zh: '黏土' },
+    'opt-loam': { en: 'Loam', zh: '壤土' },
+    'opt-sandy': { en: 'Sandy', zh: '砂质' },
+    'opt-laterite': { en: 'Laterite', zh: '红壤' },
+    'opt-washed': { en: 'Washed', zh: '水洗' },
+    'opt-natural': { en: 'Natural', zh: '日晒' },
+    'opt-honey-yellow': { en: 'Honey Yellow', zh: '黄蜜' },
+    'opt-honey-red': { en: 'Honey Red', zh: '红蜜' },
+    'opt-honey-black': { en: 'Honey Black', zh: '黑蜜' },
+    'opt-wet-hulled': { en: 'Wet Hulled', zh: '湿刨' },
+    'opt-raised-bed': { en: 'Raised Bed', zh: '棚架日晒' },
+    'opt-patio': { en: 'Patio', zh: '露台日晒' },
+    'opt-mechanical': { en: 'Mechanical', zh: '机器干燥' },
+    'opt-anaerobic-yes': { en: 'Yes', zh: '是' },
+    'opt-anaerobic-no': { en: 'No', zh: '否' },
+    'opt-light': { en: 'Light', zh: '浅烘' },
+    'opt-medium-light': { en: 'Medium Light', zh: '中浅烘' },
+    'opt-medium': { en: 'Medium', zh: '中烘' },
+    'opt-medium-dark': { en: 'Medium Dark', zh: '中深烘' },
+
+    // Country names
+    'opt-ethiopia': { en: 'Ethiopia', zh: '埃塞俄比亚' },
+    'opt-kenya': { en: 'Kenya', zh: '肯尼亚' },
+    'opt-panama': { en: 'Panama', zh: '巴拿马' },
+    'opt-colombia': { en: 'Colombia', zh: '哥伦比亚' },
+    'opt-guatemala': { en: 'Guatemala', zh: '危地马拉' },
+    'opt-costa-rica': { en: 'Costa Rica', zh: '哥斯达黎加' },
+    'opt-brazil': { en: 'Brazil', zh: '巴西' },
+    'opt-indonesia': { en: 'Indonesia', zh: '印度尼西亚' },
+    'opt-yemen': { en: 'Yemen', zh: '也门' },
+    'opt-china': { en: 'China', zh: '中国' },
+
+    // Dynamic content text
+    'rb-note': { en: 'CQI data uses standard cupping protocol — roast/brew parameters not used by model', zh: 'CQI 数据使用标准杯测协议 — 烘焙/冲煮参数未被模型使用' },
+    'loading-recommendations': { en: 'Loading recommendations...', zh: '加载推荐中...' },
+    'found-matches': { en: 'Found {n} matches!', zh: '找到 {n} 个匹配!' },
+    'saved': { en: 'Saved!', zh: '已保存!' },
+    'match-label': { en: 'match', zh: '匹配' },
+    'combinations-tested': { en: 'combinations tested', zh: '个组合已测试' },
+    'fermentation-label': { en: 'fermentation', zh: '发酵' },
+    'from-label': { en: 'from', zh: '来自' },
+    'ci-prefix': { en: '80% CI: ', zh: '80% 置信区间: ' },
   },
 
   init() {
     const saved = localStorage.getItem('lang');
-    this._lang = (saved === 'zh' || saved === 'en') ? saved : 'en';
+    if (saved === 'zh' || saved === 'en') {
+      this._lang = saved;
+    } else {
+      this._lang = navigator.language.startsWith('zh') ? 'zh' : 'en';
+    }
     this.apply();
     this._updateToggle();
   },
@@ -103,6 +152,14 @@ const I18n = {
     const entry = this.translations[key];
     if (!entry) return key;
     return entry[this._lang] || entry.en || key;
+  },
+
+  tf(key, params) {
+    let text = this.t(key);
+    for (const [k, v] of Object.entries(params)) {
+      text = text.replace(`{${k}}`, v);
+    }
+    return text;
   },
 
   apply() {
