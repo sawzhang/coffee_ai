@@ -1,0 +1,162 @@
+{
+  "val_mae": 1.8802,
+  "cv_mae": 1.8404,
+  "train_mae": 1.6781,
+  "training_seconds": 1.0,
+  "num_params": 12628,
+  "weights": [
+    0.24675572904675774,
+    0.05478270590818129,
+    0.20007571372597133,
+    0.07781596284387934,
+    0.02578640698020068,
+    0.03628018632606584,
+    0.0008607474165458429,
+    0.01057135584162501,
+    0.036813569752620255,
+    0.001322703608227471,
+    0.00017874789315220127,
+    0.01449705971577606,
+    0.0078885106887801,
+    0.0021507603397401117,
+    0.0,
+    0.0,
+    0.0,
+    0.01593322347960405,
+    0.023110913409611012,
+    0.012720530986380705,
+    0.0005268176943711365,
+    0.01050510205656992,
+    0.0,
+    0.0,
+    0.044402320458371676,
+    0.008359204347857871,
+    0.034129183556042185,
+    0.0,
+    0.016211758211430168,
+    0.05966829757676669,
+    0.05865248813547135,
+    0.0,
+    0.0
+  ],
+  "bias": 82.088,
+  "feature_names": [
+    "altitude_m",
+    "shade_pct",
+    "latitude",
+    "delta_t_c",
+    "fermentation_hours",
+    "drying_days",
+    "variety_Gesha",
+    "variety_Bourbon",
+    "variety_Typica",
+    "variety_SL28",
+    "variety_SL34",
+    "variety_Caturra",
+    "variety_Catuai",
+    "variety_Pacamara",
+    "variety_Ethiopian Heirloom",
+    "variety_74158",
+    "variety_Castillo",
+    "variety_Catimor",
+    "method_p_washed",
+    "method_p_natural",
+    "method_p_honey_yellow",
+    "method_p_honey_red",
+    "method_p_honey_black",
+    "method_p_wet_hulled",
+    "soil_type_volcanic",
+    "soil_type_clay",
+    "soil_type_loam",
+    "soil_type_sandy",
+    "soil_type_laterite",
+    "drying_method_raised_bed",
+    "drying_method_patio",
+    "drying_method_mechanical",
+    "anaerobic"
+  ],
+  "interaction_terms": [],
+  "factor_weights": {
+    "G": 0.35,
+    "P": 0.25,
+    "R": 0.0,
+    "B": 0.0
+  },
+  "model_type": "gbr",
+  "version": "v2",
+  "config": {
+    "model_type": "gbr",
+    "feature_dim": 33,
+    "gbr_params": {
+      "n_estimators": 1000,
+      "max_depth": 3,
+      "learning_rate": 0.01,
+      "subsample": 0.8,
+      "min_samples_leaf": 5,
+      "max_features": "sqrt"
+    },
+    "dropped_features": "R (roast) and B (brew) \u2014 constant in CQI data"
+  },
+  "top_features": [
+    {
+      "name": "altitude_m",
+      "importance": 0.2468
+    },
+    {
+      "name": "latitude",
+      "importance": 0.2001
+    },
+    {
+      "name": "delta_t_c",
+      "importance": 0.0778
+    },
+    {
+      "name": "drying_method_raised_bed",
+      "importance": 0.0597
+    },
+    {
+      "name": "drying_method_patio",
+      "importance": 0.0587
+    },
+    {
+      "name": "shade_pct",
+      "importance": 0.0548
+    },
+    {
+      "name": "soil_type_volcanic",
+      "importance": 0.0444
+    },
+    {
+      "name": "variety_Typica",
+      "importance": 0.0368
+    },
+    {
+      "name": "drying_days",
+      "importance": 0.0363
+    },
+    {
+      "name": "soil_type_loam",
+      "importance": 0.0341
+    },
+    {
+      "name": "fermentation_hours",
+      "importance": 0.0258
+    },
+    {
+      "name": "method_p_washed",
+      "importance": 0.0231
+    },
+    {
+      "name": "soil_type_laterite",
+      "importance": 0.0162
+    },
+    {
+      "name": "variety_Catimor",
+      "importance": 0.0159
+    },
+    {
+      "name": "variety_Caturra",
+      "importance": 0.0145
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "total_beans": 966,
+  "score_range": [
+    63.1,
+    90.6
+  ],
+  "score_mean": 82.1,
+  "countries": {
+    "Mexico": 153,
+    "Guatemala": 110,
+    "Brazil": 96,
+    "Colombia": 89,
+    "Hawaii": 67,
+    "Taiwan": 60,
+    "Honduras": 47,
+    "Costa Rica": 45,
+    "Ethiopia": 41,
+    "Tanzania, United Republic Of": 31,
+    "Thailand": 27,
+    "Nicaragua": 25,
+    "Uganda": 24,
+    "Kenya": 24,
+    "El Salvador": 19,
+    "Indonesia": 19,
+    "China": 15,
+    "Malawi": 11,
+    "Peru": 10,
+    "Vietnam": 8,
+    "Myanmar": 8,
+    "India": 7,
+    "Haiti": 6,
+    "Panama": 4,
+    "Puerto Rico": 4,
+    "Philippines": 4,
+    "Laos": 3,
+    "Burundi": 2,
+    "Papua New Guinea": 1,
+    "Japan": 1,
+    "Ecuador": 1,
+    "Rwanda": 1,
+    "Zambia": 1,
+    "Ivory Coast": 1,
+    "Mauritius": 1
+  },
+  "varieties": {
+    "Typica": 504,
+    "Caturra": 165,
+    "Bourbon": 164,
+    "Catuai": 67,
+    "Catimor": 21,
+    "SL28": 15,
+    "Gesha": 12,
+    "Pacamara": 8,
+    "SL34": 7,
+    "Ethiopian Heirloom": 3
+  },
+  "processing_methods": {
+    "washed": 686,
+    "natural": 216,
+    "honey_red": 52,
+    "honey_yellow": 12
+  },
+  "top_beans": [
+    {
+      "name": "guji-hambela Typica Washed",
+      "score": 90.6,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "guji-hambela Typica Washed",
+      "score": 89.9,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "NA Bourbon Washed",
+      "score": 89.8,
+      "country": "Guatemala",
+      "variety": "Bourbon",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "oromia Typica Natural",
+      "score": 89.0,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "natural",
+      "roast": "medium_light"
+    },
+    {
+      "name": "guji-hambela Typica Washed",
+      "score": 88.8,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "NA Typica Natural",
+      "score": 88.8,
+      "country": "Brazil",
+      "variety": "Typica",
+      "process": "natural",
+      "roast": "medium_light"
+    },
+    {
+      "name": "NA Typica Washed",
+      "score": 88.8,
+      "country": "Peru",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "oromia Typica Washed",
+      "score": 88.7,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "oromiya Typica Washed",
+      "score": 88.4,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "snnp/kaffa zone,gimbowereda Typica Natural",
+      "score": 88.2,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "natural",
+      "roast": "medium_light"
+    },
+    {
+      "name": "oromia Typica Natural",
+      "score": 88.1,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "natural",
+      "roast": "medium_light"
+    },
+    {
+      "name": "antioquia Typica Washed",
+      "score": 87.9,
+      "country": "Hawaii",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "oromiya Typica Washed",
+      "score": 87.8,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "antioquia Typica Washed",
+      "score": 87.6,
+      "country": "Hawaii",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "sulawesi Typica Washed",
+      "score": 87.4,
+      "country": "Indonesia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "yirgacheffe Typica Washed",
+      "score": 87.3,
+      "country": "Ethiopia",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "yunnan Catimor Washed",
+      "score": 87.2,
+      "country": "China",
+      "variety": "Catimor",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "gedio Ethiopian Heirloom Natural",
+      "score": 87.2,
+      "country": "Ethiopia",
+      "variety": "Ethiopian Heirloom",
+      "process": "natural",
+      "roast": "medium_light"
+    },
+    {
+      "name": "antioquia Typica Washed",
+      "score": 87.2,
+      "country": "Hawaii",
+      "variety": "Typica",
+      "process": "washed",
+      "roast": "medium_light"
+    },
+    {
+      "name": "san ramon Caturra Washed",
+      "score": 87.2,
+      "country": "Costa Rica",
+      "variety": "Caturra",
+      "process": "washed",
+      "roast": "medium_light"
+    }
+  ]
+}

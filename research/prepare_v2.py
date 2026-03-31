@@ -1,0 +1,128 @@
+"""
+Coffee Attribution AutoResearch — V2 Data Preparation
+=====================================================
+Drops constant R/B features (CQI standard cupping protocol).
+Only encodes G + P factors that have real variance in the dataset.
+
+Feature count: 28 (down from 52)
+  - Numerical (6): altitude_m, shade_pct, latitude, delta_t_c, fermentation_hours, drying_days
+  - Categorical (21): variety(12) + method_p(6) + soil_type(5) + drying_method(3) — wait that's 26
+  - Actually: variety(12) + method_p(6) + soil_type(5) = 23 categorical
+  - But drying_method has variance too (raised_bed vs patio), keep it: +3 = 26
+  - Boolean (1): anaerobic
+  - Total: 6 + 26 + 1 = 33
+
+Actually, let me compute it properly below.
+"""
+
+import json
+import numpy as np
+from pathlib import Path
+from prepare import load_data as _load_data, evaluate_model, TIME_BUDGET
+
+# ── V2 Constants: G + P features only ─────────────────────────────────
+
+VARIETIES = [
+    "Gesha", "Bourbon", "Typica", "SL28", "SL34", "Caturra",
+    "Catuai", "Pacamara", "Ethiopian Heirloom", "74158", "Castillo", "Catimor"
+]
+PROCESS_METHODS = ["washed", "natural", "honey_yellow", "honey_red", "honey_black", "wet_hulled"]
+SOIL_TYPES = ["volcanic", "clay", "loam", "sandy", "laterite"]
+DRYING_METHODS = ["raised_bed", "patio", "mechanical"]
+
+# Only numerical features with actual variance in CQI data
+NUM_RANGES_V2 = {
+    "altitude_m": (800, 2400),
+    "shade_pct": (0, 80),
+    "latitude": (-25, 25),
+    "delta_t_c": (5, 20),
+    "fermentation_hours": (0, 200),
+    "drying_days": (1, 30),
+}
+
+# Only categorical fields with variance
+CAT_FIELDS_V2 = {
+    "variety": VARIETIES,
+    "method_p": PROCESS_METHODS,
+    "soil_type": SOIL_TYPES,
+    "drying_method": DRYING_METHODS,
+}
+
+BOOL_FIELDS_V2 = ["anaerobic"]
+
+# 6 numerical + 12+6+5+3 categorical + 1 boolean = 33
+FEATURE_DIM_V2 = (
+    len(NUM_RANGES_V2)
+    + sum(len(v) for v in CAT_FIELDS_V2.values())
+    + len(BOOL_FIELDS_V2)
+)
+
+
+def encode_factors_v2(bean):
+    """Encode only G + P features (no constant R/B)."""
+    features = []
+
+    # Numerical
+    num_sources = {
+        "altitude_m": bean["G"]["altitude_m"],
+        "shade_pct": bean["G"]["shade_pct"],
+        "latitude": abs(bean["G"]["latitude"]),
+        "delta_t_c": bean["G"]["delta_t_c"],
+        "fermentation_hours": bean["P"]["fermentation_hours"],
+        "drying_days": bean["P"]["drying_days"],
+    }
+    for key in NUM_RANGES_V2:
+        lo, hi = NUM_RANGES_V2[key]
+        val = num_sources[key]
+        features.append((val - lo) / (hi - lo) if hi > lo else 0.0)
+
+    # Categorical
+    cat_sources = {
+        "variety": bean["G"]["variety"],
+        "method_p": bean["P"]["method"],
+        "soil_type": bean["G"]["soil_type"],
+        "drying_method": bean["P"]["drying_method"],
+    }
+    for field, categories in CAT_FIELDS_V2.items():
+        val = cat_sources[field]
+        for cat in categories:
+            features.append(1.0 if val == cat else 0.0)
+
+    # Boolean
+    features.append(1.0 if bean["P"]["anaerobic"] else 0.0)
+
+    return np.array(features, dtype=np.float64)
+
+
+def get_feature_names_v2():
+    """Return ordered feature names for V2 encoding."""
+    names = list(NUM_RANGES_V2.keys())
+    for field, categories in CAT_FIELDS_V2.items():
+        for cat in categories:
+            names.append(f"{field}_{cat}")
+    for b in BOOL_FIELDS_V2:
+        names.append(b)
+    return names
+
+
+def load_data(path="data/beans.json", seed=42):
+    """Delegate to original load_data."""
+    return _load_data(path, seed)
+
+
+def evaluate_model_v2(predict_fn, val_data):
+    """Same as original evaluate_model."""
+    return evaluate_model(predict_fn, val_data)
+
+
+# Verify dimensions
+assert FEATURE_DIM_V2 == len(get_feature_names_v2()), \
+    f"Dim mismatch: {FEATURE_DIM_V2} vs {len(get_feature_names_v2())}"
+
+if __name__ == "__main__":
+    print(f"V2 Feature Dimension: {FEATURE_DIM_V2}")
+    print(f"Features: {get_feature_names_v2()}")
+    print(f"\nDropped from V1 (52 → {FEATURE_DIM_V2}):")
+    print("  - R factors: roast_level(4), first_crack_temp_c, drop_temp_c, dtr_pct, total_time_s")
+    print("  - B factors: method_b(6), grind_microns, water_temp_c, ratio, brew_time_s, water_tds_ppm")
+    print(f"  - Removed {52 - FEATURE_DIM_V2} constant/noise features")

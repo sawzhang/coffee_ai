@@ -1,0 +1,360 @@
+/* Coffee Attribution AutoResearch — Styles */
+
+:root {
+  --bg: #1a1612;
+  --bg-card: #241f1a;
+  --bg-input: #2e2821;
+  --border: #3d3428;
+  --text: #e8ddd0;
+  --text-dim: #9a8d7f;
+  --accent: #c89b5e;
+  --accent-light: #e0b978;
+  --accent-dark: #8a6b3e;
+  --green: #6abf69;
+  --red: #cf6b6b;
+  --blue: #6b9fcf;
+  --radius: 12px;
+  --max-w: 1100px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.header {
+  background: linear-gradient(135deg, #2a2117, #1a1612);
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 1.5rem 2rem;
+  text-align: center;
+}
+.header h1 {
+  font-size: 1.8rem;
+  color: var(--accent-light);
+  letter-spacing: 0.02em;
+}
+.subtitle {
+  color: var(--text-dim);
+  margin-top: 0.3rem;
+  font-size: 0.95rem;
+}
+.badges {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-top: 1.2rem;
+  flex-wrap: wrap;
+}
+.badge {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-family: "SF Mono", "Fira Code", monospace;
+  color: var(--accent);
+}
+
+/* ── Container & Cards ─────────────────────────────────── */
+.container {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+.card h2 {
+  font-size: 1.15rem;
+  color: var(--accent-light);
+  margin-bottom: 0.3rem;
+}
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1.2rem;
+}
+
+/* ── Charts ────────────────────────────────────────────── */
+.chart-wrap {
+  max-width: 420px;
+  margin: 0 auto;
+}
+.chart-wrap.chart-wide {
+  max-width: 100%;
+}
+
+/* ── Bean Grid ─────────────────────────────────────────── */
+.bean-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.bean-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+.bean-card .bean-name {
+  font-weight: 600;
+  color: var(--accent-light);
+  font-size: 0.92rem;
+  margin-bottom: 0.4rem;
+}
+.bean-card .bean-meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.bean-card .bean-score {
+  display: inline-block;
+  background: var(--accent-dark);
+  color: #fff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Scorer ────────────────────────────────────────────── */
+.scorer-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+}
+@media (max-width: 768px) {
+  .scorer-layout { grid-template-columns: 1fr; }
+}
+
+.scorer-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+@media (max-width: 600px) {
+  .scorer-inputs { grid-template-columns: 1fr; }
+}
+
+.input-group {
+  background: var(--bg-input);
+  border-radius: 8px;
+  padding: 1rem;
+}
+.input-group h3 {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+.input-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.82rem;
+}
+.input-group label span {
+  min-width: 130px;
+  color: var(--text-dim);
+}
+.input-group select,
+.input-group input[type="range"] {
+  flex: 1;
+}
+.input-group output {
+  min-width: 40px;
+  text-align: right;
+  font-family: monospace;
+  color: var(--accent);
+  font-size: 0.82rem;
+}
+
+select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-size: 0.82rem;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+/* ── Score Display ─────────────────────────────────────── */
+.scorer-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.score-display {
+  text-align: center;
+  padding: 1.5rem;
+  background: var(--bg-input);
+  border-radius: var(--radius);
+  width: 100%;
+}
+.score-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 0.5rem;
+}
+.score-value {
+  display: block;
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--accent-light);
+  font-family: "SF Mono", monospace;
+}
+.score-grade {
+  display: block;
+  font-size: 0.9rem;
+  margin-top: 0.3rem;
+  color: var(--text-dim);
+}
+
+.attribution-mini {
+  width: 100%;
+  max-width: 280px;
+}
+
+/* ── User Prefs ────────────────────────────────────────── */
+.pref-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.pref-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+.pref-grid label span {
+  min-width: 160px;
+  color: var(--text-dim);
+}
+.pref-grid output {
+  min-width: 24px;
+  text-align: right;
+  font-family: monospace;
+  color: var(--accent);
+}
+
+.btn {
+  background: var(--accent-dark);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+.btn:hover { background: var(--accent); }
+
+.status-text {
+  font-size: 0.8rem;
+  color: var(--green);
+  margin-left: 0.5rem;
+}
+
+/* ── Explore Results ────────────────────────────────────── */
+.explore-header {
+  margin: 1rem 0 0.8rem;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.6rem;
+}
+.explore-card {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.explore-best {
+  border-color: var(--accent);
+  background: rgba(200, 155, 94, 0.08);
+}
+.explore-method {
+  font-weight: 600;
+  color: var(--accent-light);
+  font-size: 0.88rem;
+  text-transform: capitalize;
+}
+.explore-ferm {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+.explore-score {
+  font-size: 1.4rem;
+  font-weight: 800;
+  font-family: "SF Mono", monospace;
+  color: var(--accent-light);
+}
+.explore-grade {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+.bean-match {
+  color: var(--green);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+/* ── Footer ────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+.footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+.footer a:hover { text-decoration: underline; }

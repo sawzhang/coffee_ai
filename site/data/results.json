@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "commit": "exp_001",
+    "val_mae": 1.905583,
+    "num_params": 10000,
+    "status": "KEPT",
+    "description": "GBR baseline n=200 d=4 lr=0.05"
+  },
+  {
+    "id": 2,
+    "commit": "exp_002",
+    "val_mae": 1.895862,
+    "num_params": 25000,
+    "status": "KEPT",
+    "description": "GBR n=500 d=4 lr=0.03"
+  },
+  {
+    "id": 3,
+    "commit": "exp_003",
+    "val_mae": 1.882641,
+    "num_params": 15000,
+    "status": "KEPT",
+    "description": "GBR n=300 d=3 lr=0.05"
+  },
+  {
+    "id": 4,
+    "commit": "exp_004",
+    "val_mae": 1.924155,
+    "num_params": 25000,
+    "status": "DISCARDED",
+    "description": "GBR n=500 d=5 lr=0.02 sub=0.7"
+  },
+  {
+    "id": 5,
+    "commit": "exp_005",
+    "val_mae": 1.889539,
+    "num_params": 40000,
+    "status": "DISCARDED",
+    "description": "GBR n=800 d=4 lr=0.01 sub=0.7"
+  },
+  {
+    "id": 6,
+    "commit": "exp_006",
+    "val_mae": 1.986641,
+    "num_params": 20000,
+    "status": "DISCARDED",
+    "description": "GBR n=400 d=6 lr=0.05 leaf=10"
+  },
+  {
+    "id": 7,
+    "commit": "exp_007",
+    "val_mae": 1.978073,
+    "num_params": 30000,
+    "status": "DISCARDED",
+    "description": "GBR n=600 d=5 lr=0.03 sub=0.75 leaf=4"
+  },
+  {
+    "id": 8,
+    "commit": "exp_008",
+    "val_mae": 1.882605,
+    "num_params": 50000,
+    "status": "KEPT",
+    "description": "GBR n=1000 d=3 lr=0.01 sub=0.8"
+  },
+  {
+    "id": 9,
+    "commit": "exp_009",
+    "val_mae": 1.899599,
+    "num_params": 25000,
+    "status": "DISCARDED",
+    "description": "RF n=500 d=8 leaf=5"
+  },
+  {
+    "id": 10,
+    "commit": "exp_010",
+    "val_mae": 1.897007,
+    "num_params": 25000,
+    "status": "DISCARDED",
+    "description": "RF n=500 d=12 leaf=3"
+  },
+  {
+    "id": 11,
+    "commit": "exp_011",
+    "val_mae": 1.899116,
+    "num_params": 50000,
+    "status": "DISCARDED",
+    "description": "RF n=1000 d=10 leaf=3"
+  },
+  {
+    "id": 12,
+    "commit": "exp_012",
+    "val_mae": 1.997349,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "Ridge alpha=1.0"
+  },
+  {
+    "id": 13,
+    "commit": "exp_013",
+    "val_mae": 1.997467,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "Ridge alpha=0.1"
+  },
+  {
+    "id": 14,
+    "commit": "exp_014",
+    "val_mae": 1.991704,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "Lasso alpha=0.01"
+  },
+  {
+    "id": 15,
+    "commit": "exp_015",
+    "val_mae": 1.979788,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "ElasticNet alpha=0.1 l1=0.5"
+  },
+  {
+    "id": 16,
+    "commit": "exp_016",
+    "val_mae": 1.900885,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "SVR C=10 rbf"
+  },
+  {
+    "id": 17,
+    "commit": "exp_017",
+    "val_mae": 1.968434,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "SVR C=50 rbf eps=0.05"
+  },
+  {
+    "id": 18,
+    "commit": "exp_018",
+    "val_mae": 2.015401,
+    "num_params": 53,
+    "status": "DISCARDED",
+    "description": "SVR C=100 rbf eps=0.01"
+  },
+  {
+    "id": 19,
+    "commit": "exp_019",
+    "val_mae": 2.069862,
+    "num_params": 1380,
+    "status": "DISCARDED",
+    "description": "Ridge poly=2 alpha=0.5"
+  },
+  {
+    "id": 20,
+    "commit": "exp_020",
+    "val_mae": 1.994508,
+    "num_params": 1380,
+    "status": "DISCARDED",
+    "description": "Lasso poly=2 alpha=0.01"
+  }
+]

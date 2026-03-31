@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coffee Attribution AutoResearch</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1>Coffee Attribution AutoResearch</h1>
+      <p class="subtitle">Specialty Coffee Multi-Factor Attribution System</p>
+      <div class="badges">
+        <span class="badge" id="badge-mae">val_mae: --</span>
+        <span class="badge" id="badge-beans">beans: --</span>
+        <span class="badge" id="badge-experiments">experiments: --</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Section 1: Factor Radar -->
+    <section class="card" id="section-radar">
+      <h2>Factor Weight Radar</h2>
+      <p class="card-desc">Model-learned importance of each factor dimension (G/P/R/B)</p>
+      <div class="chart-wrap">
+        <canvas id="chart-radar"></canvas>
+      </div>
+    </section>
+
+    <!-- Section 2: Top Features -->
+    <section class="card" id="section-features">
+      <h2>Top Feature Importance</h2>
+      <p class="card-desc">Most influential features in predicting coffee quality</p>
+      <div class="chart-wrap chart-wide">
+        <canvas id="chart-features"></canvas>
+      </div>
+    </section>
+
+    <!-- Section 3: Experiment Progress -->
+    <section class="card" id="section-progress">
+      <h2>Experiment Progress</h2>
+      <p class="card-desc">AutoResearch experiment history — val_mae over iterations</p>
+      <div class="chart-wrap chart-wide">
+        <canvas id="chart-progress"></canvas>
+      </div>
+      <div id="no-experiments" class="empty-state">
+        No experiments yet. Run the research agent to start optimizing.
+      </div>
+    </section>
+
+    <!-- Section 4: Top Beans -->
+    <section class="card" id="section-beans">
+      <h2>Top Scoring Beans</h2>
+      <p class="card-desc">Highest-rated beans in the dataset</p>
+      <div class="bean-grid" id="bean-grid"></div>
+    </section>
+
+    <!-- Section 5: Interactive Scorer -->
+    <section class="card" id="section-scorer">
+      <h2>Interactive Coffee Scorer</h2>
+      <p class="card-desc">Adjust factors to predict coffee quality score</p>
+
+      <div class="scorer-layout">
+        <div class="scorer-inputs">
+          <div class="input-group">
+            <h3>G: Genetics / Geography</h3>
+            <label>
+              <span>Variety</span>
+              <select id="input-variety">
+                <option value="Gesha">Gesha</option>
+                <option value="Ethiopian Heirloom">Ethiopian Heirloom</option>
+                <option value="74158">74158</option>
+                <option value="SL28">SL28</option>
+                <option value="SL34">SL34</option>
+                <option value="Pacamara">Pacamara</option>
+                <option value="Bourbon" selected>Bourbon</option>
+                <option value="Typica">Typica</option>
+                <option value="Caturra">Caturra</option>
+                <option value="Catuai">Catuai</option>
+                <option value="Castillo">Castillo</option>
+                <option value="Catimor">Catimor</option>
+              </select>
+            </label>
+            <label>
+              <span>Altitude (m)</span>
+              <input type="range" id="input-altitude" min="800" max="2400" value="1600" step="50">
+              <output id="val-altitude">1600</output>
+            </label>
+            <label>
+              <span>Soil Type</span>
+              <select id="input-soil">
+                <option value="volcanic" selected>Volcanic</option>
+                <option value="clay">Clay</option>
+                <option value="loam">Loam</option>
+                <option value="sandy">Sandy</option>
+                <option value="laterite">Laterite</option>
+              </select>
+            </label>
+            <label>
+              <span>Shade %</span>
+              <input type="range" id="input-shade" min="0" max="80" value="30" step="5">
+              <output id="val-shade">30</output>
+            </label>
+            <label>
+              <span>Day-Night Temp Diff (C)</span>
+              <input type="range" id="input-delta-t" min="5" max="20" value="12" step="1">
+              <output id="val-delta-t">12</output>
+            </label>
+          </div>
+
+          <div class="input-group">
+            <h3>P: Processing</h3>
+            <label>
+              <span>Method</span>
+              <select id="input-process">
+                <option value="washed" selected>Washed</option>
+                <option value="natural">Natural</option>
+                <option value="honey_yellow">Honey Yellow</option>
+                <option value="honey_red">Honey Red</option>
+                <option value="honey_black">Honey Black</option>
+                <option value="wet_hulled">Wet Hulled</option>
+              </select>
+            </label>
+            <label>
+              <span>Anaerobic</span>
+              <select id="input-anaerobic">
+                <option value="false" selected>No</option>
+                <option value="true">Yes</option>
+              </select>
+            </label>
+            <label>
+              <span>Fermentation Hours</span>
+              <input type="range" id="input-ferm" min="0" max="200" value="36" step="6">
+              <output id="val-ferm">36</output>
+            </label>
+            <label>
+              <span>Drying Method</span>
+              <select id="input-drying">
+                <option value="raised_bed" selected>Raised Bed</option>
+                <option value="patio">Patio</option>
+                <option value="mechanical">Mechanical</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="input-group">
+            <h3>R: Roasting</h3>
+            <label>
+              <span>Roast Level</span>
+              <select id="input-roast">
+                <option value="light">Light</option>
+                <option value="medium_light" selected>Medium Light</option>
+                <option value="medium">Medium</option>
+                <option value="medium_dark">Medium Dark</option>
+              </select>
+            </label>
+            <label>
+              <span>DTR %</span>
+              <input type="range" id="input-dtr" min="15" max="35" value="22" step="1">
+              <output id="val-dtr">22</output>
+            </label>
+            <label>
+              <span>Drop Temp (C)</span>
+              <input type="range" id="input-drop-temp" min="190" max="230" value="205" step="1">
+              <output id="val-drop-temp">205</output>
+            </label>
+          </div>
+
+          <div class="input-group">
+            <h3>B: Brewing</h3>
+            <label>
+              <span>Method</span>
+              <select id="input-brew">
+                <option value="v60" selected>V60</option>
+                <option value="kalita">Kalita</option>
+                <option value="chemex">Chemex</option>
+                <option value="aeropress">AeroPress</option>
+                <option value="french_press">French Press</option>
+                <option value="espresso">Espresso</option>
+              </select>
+            </label>
+            <label>
+              <span>Water Temp (C)</span>
+              <input type="range" id="input-water-temp" min="80" max="100" value="93" step="1">
+              <output id="val-water-temp">93</output>
+            </label>
+            <label>
+              <span>Ratio (1:X)</span>
+              <input type="range" id="input-ratio" min="1" max="18" value="15" step="0.5">
+              <output id="val-ratio">15</output>
+            </label>
+            <label>
+              <span>Grind (microns)</span>
+              <input type="range" id="input-grind" min="200" max="1200" value="600" step="50">
+              <output id="val-grind">600</output>
+            </label>
+          </div>
+        </div>
+
+        <div class="scorer-result">
+          <div class="score-display">
+            <span class="score-label">Predicted Score</span>
+            <span class="score-value" id="predicted-score">--</span>
+            <span class="score-grade" id="predicted-grade"></span>
+          </div>
+          <div class="attribution-mini">
+            <canvas id="chart-attribution"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Factor Recombination Engine -->
+    <section class="card" id="section-explore">
+      <h2>Factor Recombination Engine</h2>
+      <p class="card-desc">Fix the G factor above, explore all P combinations to find the best match</p>
+      <button class="btn" id="btn-explore">Explore Combinations</button>
+      <div id="explore-results"></div>
+    </section>
+
+    <!-- Section 7: User Preference (U Factor) -->
+    <section class="card" id="section-user">
+      <h2>U: Your Taste Profile</h2>
+      <p class="card-desc">Set your preferences — save to get personalized bean recommendations</p>
+      <div class="pref-grid">
+        <label>
+          <span>Acidity Preference</span>
+          <input type="range" id="pref-acidity" min="0" max="10" value="5" step="1">
+          <output id="val-pref-acidity">5</output>
+        </label>
+        <label>
+          <span>Sweetness Weight</span>
+          <input type="range" id="pref-sweetness" min="0" max="10" value="7" step="1">
+          <output id="val-pref-sweetness">7</output>
+        </label>
+        <label>
+          <span>Complexity Tolerance</span>
+          <input type="range" id="pref-complexity" min="0" max="10" value="5" step="1">
+          <output id="val-pref-complexity">5</output>
+        </label>
+        <label>
+          <span>Fermentation Acceptance</span>
+          <input type="range" id="pref-fermentation" min="0" max="10" value="5" step="1">
+          <output id="val-pref-fermentation">5</output>
+        </label>
+        <label>
+          <span>Body Preference</span>
+          <input type="range" id="pref-body" min="0" max="10" value="5" step="1">
+          <output id="val-pref-body">5</output>
+        </label>
+      </div>
+      <button class="btn" id="btn-save-prefs">Save & Get Recommendations</button>
+      <span id="pref-status" class="status-text"></span>
+      <div id="recommend-results" class="bean-grid" style="margin-top:1rem;"></div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Coffee Attribution AutoResearch &mdash; Powered by
+      <a href="https://github.com/karpathy/autoresearch" target="_blank">autoresearch</a> pattern
+    </p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

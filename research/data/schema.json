@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CoffeeBean",
+  "description": "Specialty coffee bean with G/P/R/B factor annotations and cupping scores",
+  "type": "object",
+  "required": ["id", "name", "G", "P", "R", "B", "scores"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "G": {
+      "type": "object",
+      "required": ["variety", "altitude_m", "country", "region", "soil_type", "shade_pct", "latitude", "delta_t_c"],
+      "properties": {
+        "variety": {
+          "type": "string",
+          "enum": ["Gesha", "Bourbon", "Typica", "SL28", "SL34", "Caturra", "Catuai", "Pacamara", "Ethiopian Heirloom", "74158", "Castillo", "Catimor"]
+        },
+        "altitude_m": { "type": "number", "minimum": 800, "maximum": 2400 },
+        "country": { "type": "string" },
+        "region": { "type": "string" },
+        "soil_type": {
+          "type": "string",
+          "enum": ["volcanic", "clay", "loam", "sandy", "laterite"]
+        },
+        "shade_pct": { "type": "number", "minimum": 0, "maximum": 80 },
+        "latitude": { "type": "number", "minimum": -25, "maximum": 25 },
+        "delta_t_c": { "type": "number", "minimum": 5, "maximum": 20 }
+      }
+    },
+    "P": {
+      "type": "object",
+      "required": ["method", "anaerobic", "fermentation_hours", "drying_method", "drying_days"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["washed", "natural", "honey_yellow", "honey_red", "honey_black", "wet_hulled"]
+        },
+        "anaerobic": { "type": "boolean" },
+        "fermentation_hours": { "type": "number", "minimum": 0, "maximum": 200 },
+        "drying_method": {
+          "type": "string",
+          "enum": ["raised_bed", "patio", "mechanical"]
+        },
+        "drying_days": { "type": "number", "minimum": 1, "maximum": 30 }
+      }
+    },
+    "R": {
+      "type": "object",
+      "required": ["roast_level", "first_crack_temp_c", "drop_temp_c", "dtr_pct", "total_time_s"],
+      "properties": {
+        "roast_level": {
+          "type": "string",
+          "enum": ["light", "medium_light", "medium", "medium_dark"]
+        },
+        "first_crack_temp_c": { "type": "number", "minimum": 185, "maximum": 210 },
+        "drop_temp_c": { "type": "number", "minimum": 190, "maximum": 230 },
+        "dtr_pct": { "type": "number", "minimum": 15, "maximum": 35 },
+        "total_time_s": { "type": "number", "minimum": 420, "maximum": 900 }
+      }
+    },
+    "B": {
+      "type": "object",
+      "required": ["method", "grind_microns", "water_temp_c", "ratio", "brew_time_s", "water_tds_ppm"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": ["v60", "kalita", "chemex", "aeropress", "french_press", "espresso"]
+        },
+        "grind_microns": { "type": "number", "minimum": 200, "maximum": 1200 },
+        "water_temp_c": { "type": "number", "minimum": 80, "maximum": 100 },
+        "ratio": { "type": "number", "minimum": 1, "maximum": 18 },
+        "brew_time_s": { "type": "number", "minimum": 25, "maximum": 300 },
+        "water_tds_ppm": { "type": "number", "minimum": 30, "maximum": 250 }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "required": ["overall", "aroma", "acidity", "sweetness", "body", "aftertaste", "balance"],
+      "properties": {
+        "overall": { "type": "number", "minimum": 60, "maximum": 100 },
+        "aroma": { "type": "number", "minimum": 5, "maximum": 10 },
+        "acidity": { "type": "number", "minimum": 5, "maximum": 10 },
+        "sweetness": { "type": "number", "minimum": 5, "maximum": 10 },
+        "body": { "type": "number", "minimum": 5, "maximum": 10 },
+        "aftertaste": { "type": "number", "minimum": 5, "maximum": 10 },
+        "balance": { "type": "number", "minimum": 5, "maximum": 10 }
+      }
+    }
+  }
+}
