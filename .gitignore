@@ -10,6 +10,7 @@ research/results.tsv
 research/run.log
 research/*.png
 research/model.pkl
+research/model.joblib
 research/experiment_config.json
 
 # OS

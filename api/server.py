@@ -8,13 +8,12 @@ Run: uvicorn api.server:app --reload --port 8000
   or: python3 -m api.server
 """
 
+import os
 import sys
 import json
 import numpy as np
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Optional
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -24,55 +23,67 @@ from pydantic import BaseModel, Field
 RESEARCH_DIR = Path(__file__).parent.parent / "research"
 sys.path.insert(0, str(RESEARCH_DIR))
 
-from prepare_v2 import (
+from prepare_v2 import (  # noqa: E402
     encode_factors_v2, get_feature_names_v2, load_data,
-    FEATURE_DIM_V2, NUM_RANGES_V2, CAT_FIELDS_V2,
-    VARIETIES, PROCESS_METHODS, SOIL_TYPES, DRYING_METHODS,
+    FEATURE_DIM_V2, PROCESS_METHODS,
 )
 
-# ── Global state ──────────────────────────────────────────────────────
-MODEL = None
-TRAIN_DATA = None
-VAL_DATA = None
-BEANS_ALL = None
-FEATURE_NAMES = None
+# ── App state (loaded once at startup, read-only thereafter) ─────────
+
+class _AppState:
+    """Container for app-wide state loaded during startup."""
+    model = None
+    beans_all: list = []
+    feature_names: list = []
 
 
-def load_model():
-    """Load trained sklearn pipeline from pickle."""
-    global MODEL
-    import pickle
-    model_path = RESEARCH_DIR / "model.pkl"
+state = _AppState()
+
+
+def _load_model():
+    """Load trained sklearn pipeline from joblib."""
+    import joblib
+    from sklearn.pipeline import Pipeline
+    model_path = RESEARCH_DIR / "model.joblib"
+    # Fallback to legacy pickle if joblib not found
+    if not model_path.exists():
+        model_path = RESEARCH_DIR / "model.pkl"
     if model_path.exists():
-        with open(model_path, "rb") as f:
-            MODEL = pickle.load(f)
-        print(f"Model loaded from {model_path}")
+        loaded = joblib.load(model_path)
+        if not isinstance(loaded, Pipeline):
+            print(f"WARNING: loaded model is not a Pipeline, got {type(loaded)}")
+        else:
+            state.model = loaded
+            print(f"Model loaded from {model_path}")
     else:
-        print(f"WARNING: {model_path} not found. Run train_v2.py first.")
+        print("WARNING: no model file found. Run train_v2.py first.")
 
 
-def load_beans():
+def _load_beans():
     """Load full bean dataset for recommendation."""
-    global TRAIN_DATA, VAL_DATA, BEANS_ALL, FEATURE_NAMES
     beans_path = str(RESEARCH_DIR / "data" / "beans.json")
-    TRAIN_DATA, VAL_DATA = load_data(beans_path)
-    BEANS_ALL = TRAIN_DATA + VAL_DATA
-    FEATURE_NAMES = get_feature_names_v2()
-    print(f"Loaded {len(BEANS_ALL)} beans")
+    train_data, val_data = load_data(beans_path)
+    state.beans_all = train_data + val_data
+    state.feature_names = get_feature_names_v2()
+    print(f"Loaded {len(state.beans_all)} beans")
 
 
 @asynccontextmanager
 async def lifespan(app):
-    load_model()
-    load_beans()
+    _load_model()
+    _load_beans()
     yield
 
 
 app = FastAPI(title="Coffee Attribution API", version="2.0", lifespan=lifespan)
 
+ALLOWED_ORIGINS = os.environ.get(
+    "CORS_ORIGINS", "http://localhost:8080,http://localhost:8000"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -151,23 +162,23 @@ def bean_from_request(req: PredictRequest) -> dict:
 
 def predict_single(bean: dict) -> float:
     """Predict score for a single bean using V2 features."""
-    if MODEL is None:
+    if state.model is None:
         return 80.0  # fallback
     features = encode_factors_v2(bean).reshape(1, -1)
-    pred = MODEL.predict(features)[0]
+    pred = state.model.predict(features)[0]
     return float(np.clip(pred, 60, 100))
 
 
 def get_attribution(bean: dict) -> dict:
     """Compute per-factor attribution using model."""
-    if MODEL is None:
+    if state.model is None:
         return {"G": 0.5, "P": 0.3, "R": 0.1, "B": 0.1}
 
     features = encode_factors_v2(bean)
-    names = FEATURE_NAMES
+    names = state.feature_names
 
     # Get feature importance from model
-    model_step = MODEL.named_steps.get("model")
+    model_step = state.model.named_steps.get("model")
     if hasattr(model_step, "feature_importances_"):
         importances = model_step.feature_importances_
     elif hasattr(model_step, "coef_"):
@@ -200,11 +211,16 @@ def get_attribution(bean: dict) -> dict:
 
 
 def score_grade(score: float) -> str:
-    if score >= 90: return "Outstanding"
-    if score >= 85: return "Excellent"
-    if score >= 80: return "Very Good"
-    if score >= 75: return "Good"
-    if score >= 70: return "Fair"
+    if score >= 90:
+        return "Outstanding"
+    if score >= 85:
+        return "Excellent"
+    if score >= 80:
+        return "Very Good"
+    if score >= 75:
+        return "Good"
+    if score >= 70:
+        return "Fair"
     return "Below Specialty"
 
 
@@ -245,8 +261,8 @@ def match_user_prefs(bean: dict, prefs: UserPrefs) -> float:
 def health():
     return {
         "status": "ok",
-        "model_loaded": MODEL is not None,
-        "beans_loaded": len(BEANS_ALL) if BEANS_ALL else 0,
+        "model_loaded": state.model is not None,
+        "beans_loaded": len(state.beans_all),
         "feature_dim": FEATURE_DIM_V2,
     }
 
@@ -269,11 +285,11 @@ def predict(req: PredictRequest):
 @app.post("/api/recommend")
 def recommend(req: RecommendRequest):
     """Recommend beans matching user taste profile."""
-    if not BEANS_ALL:
+    if not state.beans_all:
         return {"beans": [], "message": "No beans loaded"}
 
     scored = []
-    for bean in BEANS_ALL:
+    for bean in state.beans_all:
         pred_score = predict_single(bean)
         pref_match = match_user_prefs(bean, req.prefs)
         # Normalize both to 0-1 before blending (pred_score range: 60-100)

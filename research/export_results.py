@@ -6,8 +6,8 @@ Reads results.tsv and outputs:
 - site/data/beans_summary.json — bean dataset summary for the site
 """
 
-import json
 import csv
+import json
 from pathlib import Path
 
 RESEARCH_DIR = Path(__file__).parent

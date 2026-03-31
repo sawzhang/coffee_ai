@@ -7,19 +7,22 @@ Saves model as pickle for API server consumption.
 Run: python3 train_v2.py
 """
 
-import time
 import json
-import pickle
-import numpy as np
+import time
 from pathlib import Path
+
+import joblib
+import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.preprocessing import StandardScaler
-from sklearn.pipeline import Pipeline
 from sklearn.model_selection import cross_val_score
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
 
 from prepare_v2 import (
-    load_data, encode_factors_v2, evaluate_model_v2,
-    FEATURE_DIM_V2, get_feature_names_v2, NUM_RANGES_V2, CAT_FIELDS_V2,
+    FEATURE_DIM_V2,
+    encode_factors_v2,
+    get_feature_names_v2,
+    load_data,
 )
 
 # ── Configuration ─────────────────────────────────────────────────────
@@ -76,7 +79,7 @@ def main():
     )
     cv_mae = -cv_scores.mean()
 
-    print(f"\n--- RESULTS ---")
+    print("\n--- RESULTS ---")
     print(f"val_mae: {val_mae:.6f}")
     print(f"train_mae: {train_mae:.6f}")
     print(f"cv_mae (5-fold): {cv_mae:.6f} ± {cv_scores.std():.4f}")
@@ -86,15 +89,14 @@ def main():
     model = pipeline.named_steps["model"]
     importances = model.feature_importances_
     ranked = sorted(zip(feature_names, importances), key=lambda x: -x[1])
-    print(f"\nTop features (V2):")
+    print("\nTop features (V2):")
     for name, w in ranked[:15]:
         print(f"  {name:30s} {w:.4f}")
 
-    # Save pickle for API
-    pkl_path = Path(__file__).parent / "model.pkl"
-    with open(pkl_path, "wb") as f:
-        pickle.dump(pipeline, f)
-    print(f"\nModel saved to {pkl_path}")
+    # Save model for API
+    model_path = Path(__file__).parent / "model.joblib"
+    joblib.dump(pipeline, model_path)
+    print(f"\nModel saved to {model_path}")
 
     # Export model.json for site
     model_data = {
