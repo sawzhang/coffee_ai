@@ -3,8 +3,9 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Install all dependencies directly (more reliable than pyproject.toml extras)
-RUN pip install --no-cache-dir \
+# Install uv for fast dependency resolution, then install all deps
+RUN pip install --no-cache-dir uv \
+    && uv pip install --system --no-cache \
     numpy scipy scikit-learn pandas matplotlib joblib \
     fastapi uvicorn pydantic
 
