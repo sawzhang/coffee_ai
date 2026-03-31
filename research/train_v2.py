@@ -302,6 +302,26 @@ def main():
     joblib.dump(pipeline, model_path)
     print(f"\nModel saved to {model_path}")
 
+    # Train quantile models for prediction intervals
+    print("\nTraining quantile models for prediction intervals...")
+    quantile_models = {}
+    for alpha, label in [(0.1, "low"), (0.9, "high")]:
+        q_gbr = GradientBoostingRegressor(
+            n_estimators=800, max_depth=3, learning_rate=0.01,
+            subsample=0.85, min_samples_leaf=5, max_features="sqrt",
+            loss="quantile", alpha=alpha,
+        )
+        q_pipe = Pipeline([("scaler", StandardScaler()), ("model", q_gbr)])
+        q_pipe.fit(train_X, train_y)
+        q_preds = q_pipe.predict(val_X)
+        q_mae = float(np.mean(np.abs(q_preds - val_y)))
+        quantile_models[label] = q_pipe
+        print(f"  quantile_{label} (alpha={alpha}): val_mae={q_mae:.4f}")
+
+    quantile_path = Path(__file__).parent / "model_quantiles.joblib"
+    joblib.dump(quantile_models, quantile_path)
+    print(f"Quantile models saved to {quantile_path}")
+
     # Export model.json for site
     num_params = _count_params(model)
     model_data = {

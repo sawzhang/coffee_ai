@@ -36,6 +36,7 @@ from prepare_v2 import (  # noqa: E402
 class _AppState:
     """Container for app-wide state loaded during startup."""
     model = None
+    quantile_models: dict = {}  # {"low": Pipeline, "high": Pipeline}
     beans_all: list = []
     feature_names: list = []
     _json_cache: dict = {}
@@ -73,6 +74,14 @@ def _load_model():
             print(f"Model loaded from {model_path}")
     else:
         print("WARNING: no model file found. Run train_v2.py first.")
+
+    # Load quantile models for prediction intervals
+    quantile_path = RESEARCH_DIR / "model_quantiles.joblib"
+    if quantile_path.exists():
+        state.quantile_models = joblib.load(quantile_path)
+        print(f"Quantile models loaded from {quantile_path}")
+    else:
+        print("NOTE: no quantile models found. Prediction intervals unavailable.")
 
 
 def _load_beans():
@@ -191,6 +200,22 @@ def predict_single(bean: dict) -> float:
         features = encode_factors_v2(bean).reshape(1, -1)
         pred = state.model.predict(features)[0]
     return float(np.clip(pred, 60, 100))
+
+
+def predict_interval(bean: dict) -> dict | None:
+    """Predict 80% confidence interval using quantile models."""
+    if not state.quantile_models:
+        return None
+    try:
+        features = encode_factors_v2_extended(bean).reshape(1, -1)
+    except Exception:
+        features = encode_factors_v2(bean).reshape(1, -1)
+    try:
+        low = float(np.clip(state.quantile_models["low"].predict(features)[0], 60, 100))
+        high = float(np.clip(state.quantile_models["high"].predict(features)[0], 60, 100))
+        return {"score_low": round(low, 1), "score_high": round(high, 1)}
+    except Exception:
+        return None
 
 
 def get_attribution(bean: dict) -> dict:
@@ -312,12 +337,16 @@ def predict(req: PredictRequest):
     score = predict_single(bean)
     attribution = get_attribution(bean)
 
-    return {
+    result = {
         "score": round(score, 1),
         "grade": score_grade(score),
         "attribution": attribution,
         "feature_dim": FEATURE_DIM_V2,
     }
+    interval = predict_interval(bean)
+    if interval:
+        result.update(interval)
+    return result
 
 
 @app.post("/api/compare")

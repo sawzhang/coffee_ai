@@ -142,6 +142,15 @@
         : result.grade;
       document.getElementById('predicted-grade').textContent = gradeText;
 
+      // Show prediction interval if available
+      const intervalEl = document.getElementById('predicted-interval');
+      if (intervalEl && result.score_low && result.score_high) {
+        intervalEl.textContent = `${result.score_low.toFixed(1)} – ${result.score_high.toFixed(1)}`;
+        intervalEl.style.display = '';
+      } else if (intervalEl) {
+        intervalEl.style.display = 'none';
+      }
+
       if (result.attribution) {
         CoffeeCharts.renderAttribution('chart-attribution', result.attribution);
       }
