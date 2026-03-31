@@ -7,7 +7,7 @@
 const CoffeeScorer = {
   // Auto-detect API: use local if available, otherwise try remote Render deployment
   API_BASE: '/api',
-  _remoteBase: 'https://coffee-ai-api.onrender.com/api',
+  _remoteBase: 'https://coffee-ai-6fhq.onrender.com/api',
   _apiChecked: false,
   _useRemote: false,
 
