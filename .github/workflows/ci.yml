@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install ruff
-      - run: ruff check api/ research/train_v2.py research/export_results.py
+      - run: ruff check api/ research/train_v2.py research/prepare_v2.py research/export_results.py
 
   test:
     runs-on: ubuntu-latest
@@ -24,3 +24,23 @@ jobs:
           python-version: "3.11"
       - run: pip install "research/[dev,api]"
       - run: pytest tests/ -v
+
+  model-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install scikit-learn numpy scipy pandas joblib
+      - name: Train and validate model quality
+        run: |
+          cd research
+          python3 train_v2.py 2>&1 | tee train_output.txt
+          VAL_MAE=$(grep 'val_mae:' train_output.txt | head -1 | awk '{print $2}')
+          echo "val_mae = $VAL_MAE"
+          python3 -c "
+          mae = float('$VAL_MAE')
+          assert mae < 1.95, f'val_mae {mae} exceeds threshold 1.95'
+          print(f'Model quality gate PASSED: val_mae={mae:.4f} < 1.95')
+          "

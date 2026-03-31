@@ -99,6 +99,21 @@
               </select>
             </label>
             <label>
+              <span data-i18n="label-country">Country</span>
+              <select id="input-country">
+                <option value="Ethiopia">Ethiopia</option>
+                <option value="Kenya">Kenya</option>
+                <option value="Panama">Panama</option>
+                <option value="Colombia" selected>Colombia</option>
+                <option value="Guatemala">Guatemala</option>
+                <option value="Costa Rica">Costa Rica</option>
+                <option value="Brazil">Brazil</option>
+                <option value="Indonesia">Indonesia</option>
+                <option value="Yemen">Yemen</option>
+                <option value="China">China</option>
+              </select>
+            </label>
+            <label>
               <span data-i18n="label-altitude">Altitude (m)</span>
               <input type="range" id="input-altitude" min="800" max="2400" value="1600" step="50">
               <output id="val-altitude">1600</output>
@@ -160,8 +175,8 @@
             </label>
           </div>
 
-          <div class="input-group input-group-disabled">
-            <h3 data-i18n="factor-r">R: Roasting</h3>
+          <details class="input-group input-group-disabled">
+            <summary><h3 data-i18n="factor-r">R: Roasting</h3></summary>
             <label>
               <span data-i18n="label-roast">Roast Level</span>
               <select id="input-roast">
@@ -181,10 +196,10 @@
               <input type="range" id="input-drop-temp" min="190" max="230" value="205" step="1">
               <output id="val-drop-temp">205</output>
             </label>
-          </div>
+          </details>
 
-          <div class="input-group input-group-disabled">
-            <h3 data-i18n="factor-b">B: Brewing</h3>
+          <details class="input-group input-group-disabled">
+            <summary><h3 data-i18n="factor-b">B: Brewing</h3></summary>
             <label>
               <span data-i18n="label-brew-method">Method</span>
               <select id="input-brew">
@@ -211,7 +226,7 @@
               <input type="range" id="input-grind" min="200" max="1200" value="600" step="50">
               <output id="val-grind">600</output>
             </label>
-          </div>
+          </details>
 
           <p class="rb-note">CQI 数据使用标准杯测协议 &mdash; 烘焙/冲煮参数未被模型使用 | CQI data uses standard cupping protocol &mdash; roast/brew parameters not used by model</p>
         </div>

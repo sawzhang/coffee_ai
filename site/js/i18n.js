@@ -35,6 +35,7 @@ const I18n = {
     'factor-b': { en: 'B: Brewing', zh: 'B: 冲煮' },
 
     // Input labels
+    'label-country': { en: 'Country', zh: '产地' },
     'label-variety': { en: 'Variety', zh: '品种' },
     'label-altitude': { en: 'Altitude (m)', zh: '海拔 (m)' },
     'label-soil': { en: 'Soil Type', zh: '土壤类型' },

@@ -83,7 +83,7 @@
   }
 
   const selects = [
-    'input-variety', 'input-soil', 'input-process', 'input-anaerobic',
+    'input-variety', 'input-country', 'input-soil', 'input-process', 'input-anaerobic',
     'input-drying', 'input-roast', 'input-brew'
   ];
   for (const id of selects) {
@@ -98,13 +98,19 @@
     scoreTimeout = setTimeout(updateScore, 200);
   }
 
+  const COUNTRY_LATITUDES = {
+    'Ethiopia': 8, 'Kenya': 0, 'Panama': 9, 'Colombia': 5,
+    'Guatemala': 15, 'Costa Rica': 10, 'Brazil': -18,
+    'Indonesia': -2, 'Yemen': 15, 'China': 22,
+  };
+
   function getInputs() {
     return {
       variety: val('input-variety'),
       altitude_m: num('input-altitude'),
       soil_type: val('input-soil'),
       shade_pct: num('input-shade'),
-      latitude: 8,
+      latitude: COUNTRY_LATITUDES[val('input-country')] || 8,
       delta_t_c: num('input-delta-t'),
       method_p: val('input-process'),
       anaerobic: val('input-anaerobic') === 'true',
@@ -153,7 +159,7 @@
       const gFactors = {
         variety: inputs.variety,
         altitude_m: inputs.altitude_m,
-        country: 'Colombia',
+        country: val('input-country'),
         region: '',
         soil_type: inputs.soil_type,
         shade_pct: inputs.shade_pct,

@@ -7,6 +7,7 @@ bean recommendation, and factor recombination endpoints.
 Run: uvicorn api.server:app --reload --port 8000
   or: python3 -m api.server
 """
+from __future__ import annotations
 
 import os
 import sys
@@ -24,8 +25,10 @@ RESEARCH_DIR = Path(__file__).parent.parent / "research"
 sys.path.insert(0, str(RESEARCH_DIR))
 
 from prepare_v2 import (  # noqa: E402
-    encode_factors_v2, get_feature_names_v2, load_data,
-    FEATURE_DIM_V2, PROCESS_METHODS,
+    encode_factors_v2, encode_factors_v2_extended,
+    get_feature_names_v2, get_feature_names_v2_extended,
+    load_data, FEATURE_DIM_V2, FEATURE_DIM_V2_EXTENDED,
+    PROCESS_METHODS,
 )
 
 # ── App state (loaded once at startup, read-only thereafter) ─────────
@@ -106,20 +109,20 @@ app.add_middleware(
 
 class GFactors(BaseModel):
     variety: str = "Bourbon"
-    altitude_m: float = 1600
+    altitude_m: float = Field(1600, ge=0, le=6000)
     country: str = "Colombia"
     region: str = "Huila"
     soil_type: str = "volcanic"
-    shade_pct: float = 30
-    latitude: float = 4
-    delta_t_c: float = 11
+    shade_pct: float = Field(30, ge=0, le=100)
+    latitude: float = Field(4, ge=-90, le=90)
+    delta_t_c: float = Field(11, ge=0, le=40)
 
 class PFactors(BaseModel):
     method: str = "washed"
     anaerobic: bool = False
-    fermentation_hours: float = 24
+    fermentation_hours: float = Field(24, ge=0, le=500)
     drying_method: str = "raised_bed"
-    drying_days: float = 12
+    drying_days: float = Field(12, ge=0, le=90)
 
 class RFactors(BaseModel):
     roast_level: str = "medium_light"
@@ -160,16 +163,20 @@ class ExploreRequest(BaseModel):
     vary_anaerobic: list[bool] = Field(default_factory=lambda: [False, True])
     vary_fermentation: list[float] = Field(default_factory=lambda: [24, 48, 72, 120])
 
+class CompareRequest(BaseModel):
+    bean_a: PredictRequest = PredictRequest()
+    bean_b: PredictRequest = PredictRequest()
+
 
 # ── Helpers ───────────────────────────────────────────────────────────
 
 def bean_from_request(req: PredictRequest) -> dict:
     """Convert API request to bean dict for model."""
     return {
-        "G": req.G.dict(),
-        "P": req.P.dict(),
-        "R": req.R.dict(),
-        "B": req.B.dict(),
+        "G": req.G.model_dump(),
+        "P": req.P.model_dump(),
+        "R": req.R.model_dump(),
+        "B": req.B.model_dump(),
     }
 
 
@@ -177,8 +184,12 @@ def predict_single(bean: dict) -> float:
     """Predict score for a single bean using V2 features."""
     if state.model is None:
         return 80.0  # fallback
-    features = encode_factors_v2(bean).reshape(1, -1)
-    pred = state.model.predict(features)[0]
+    try:
+        features = encode_factors_v2_extended(bean).reshape(1, -1)
+        pred = state.model.predict(features)[0]
+    except Exception:
+        features = encode_factors_v2(bean).reshape(1, -1)
+        pred = state.model.predict(features)[0]
     return float(np.clip(pred, 60, 100))
 
 
@@ -187,8 +198,12 @@ def get_attribution(bean: dict) -> dict:
     if state.model is None:
         return {"G": 0.5, "P": 0.3, "R": 0.1, "B": 0.1}
 
-    features = encode_factors_v2(bean)
-    names = state.feature_names
+    try:
+        features = encode_factors_v2_extended(bean)
+        names = get_feature_names_v2_extended()
+    except Exception:
+        features = encode_factors_v2(bean)
+        names = state.feature_names
 
     # Get feature importance from model
     model_step = state.model.named_steps.get("model")
@@ -305,6 +320,35 @@ def predict(req: PredictRequest):
     }
 
 
+@app.post("/api/compare")
+def compare(req: CompareRequest):
+    """Compare two beans side by side."""
+    bean_a = bean_from_request(req.bean_a)
+    bean_b = bean_from_request(req.bean_b)
+
+    score_a = predict_single(bean_a)
+    score_b = predict_single(bean_b)
+    attr_a = get_attribution(bean_a)
+    attr_b = get_attribution(bean_b)
+
+    return {
+        "bean_a": {
+            "score": round(score_a, 1),
+            "grade": score_grade(score_a),
+            "attribution": attr_a,
+        },
+        "bean_b": {
+            "score": round(score_b, 1),
+            "grade": score_grade(score_b),
+            "attribution": attr_b,
+        },
+        "delta": {
+            "score": round(score_a - score_b, 1),
+            "attribution": {k: round(attr_a[k] - attr_b.get(k, 0), 3) for k in attr_a},
+        },
+    }
+
+
 @app.post("/api/recommend")
 def recommend(req: RecommendRequest):
     """Recommend beans matching user taste profile."""
@@ -343,7 +387,7 @@ def explore(req: ExploreRequest):
         for anaerobic in req.vary_anaerobic:
             for ferm_h in req.vary_fermentation:
                 bean = {
-                    "G": req.G.dict(),
+                    "G": req.G.model_dump(),
                     "P": {
                         "method": method,
                         "anaerobic": anaerobic,
