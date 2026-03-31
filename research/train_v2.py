@@ -32,22 +32,25 @@ from prepare_v2 import (
 # ── Configuration ─────────────────────────────────────────────────────
 MODEL_TYPE = "stacking"  # "gbr", "hgbr", "voting", "stacking"
 
-USE_EXTENDED_FEATURES = False
+USE_EXTENDED_FEATURES = True
 
 GBR_PARAMS = {
-    "n_estimators": 1000,
+    "n_estimators": 1500,
     "max_depth": 3,
-    "learning_rate": 0.01,
-    "subsample": 0.8,
-    "min_samples_leaf": 5,
+    "learning_rate": 0.015,
+    "subsample": 0.85,
+    "min_samples_leaf": 3,
     "max_features": "sqrt",
+    "loss": "huber",
+    "alpha": 0.9,
 }
 
 HGBR_PARAMS = {
-    "max_iter": 1000,
+    "max_iter": 2000,
     "max_depth": 3,
-    "learning_rate": 0.01,
+    "learning_rate": 0.005,
     "min_samples_leaf": 5,
+    "l2_regularization": 0.05,
 }
 
 USE_SCALER = True
@@ -84,7 +87,7 @@ def _build_model():
         ]
         return StackingRegressor(
             estimators=estimators,
-            final_estimator=Ridge(alpha=1.0),
+            final_estimator=Ridge(alpha=3.0),
             cv=5,
         )
     else:
@@ -140,6 +143,88 @@ def _count_params(model):
     return 0
 
 
+def _target_encode_variety(train_data, val_data, n_folds=5, noise_sigma=0.1, seed=42):
+    """K-fold target encoding for variety to avoid leakage."""
+    from sklearn.model_selection import KFold
+    rng = np.random.RandomState(seed)
+
+    train_varieties = [b["G"]["variety"] for b in train_data]
+    train_targets = np.array([b["scores"]["overall"] for b in train_data])
+    val_varieties = [b["G"]["variety"] for b in val_data]
+
+    # K-fold encoding for training data
+    train_encoded = np.zeros(len(train_data))
+    kf = KFold(n_splits=n_folds, shuffle=True, random_state=seed)
+    for train_idx, val_idx in kf.split(train_data):
+        # Compute means from train fold
+        fold_means = {}
+        for i in train_idx:
+            v = train_varieties[i]
+            fold_means.setdefault(v, []).append(train_targets[i])
+        fold_means = {v: np.mean(scores) for v, scores in fold_means.items()}
+        global_mean = train_targets[train_idx].mean()
+        # Apply to val fold
+        for i in val_idx:
+            train_encoded[i] = fold_means.get(train_varieties[i], global_mean)
+
+    # Add noise regularization
+    train_encoded += rng.normal(0, noise_sigma, len(train_encoded))
+
+    # For validation: use full training set means
+    full_means = {}
+    for v, t in zip(train_varieties, train_targets):
+        full_means.setdefault(v, []).append(t)
+    full_means = {v: np.mean(scores) for v, scores in full_means.items()}
+    global_mean = train_targets.mean()
+    val_encoded = np.array([full_means.get(v, global_mean) for v in val_varieties])
+
+    return train_encoded, val_encoded
+
+
+def _optimize_hyperparams(train_X, train_y, val_X, val_y):
+    """Use scipy to optimize GBR hyperparameters."""
+    from scipy.optimize import differential_evolution
+
+    all_X = np.vstack([train_X, val_X])
+    all_y = np.concatenate([train_y, val_y])
+
+    def objective(params):
+        lr, subsample, min_leaf, n_est_frac = params
+        n_est = int(500 + n_est_frac * 1500)  # 500-2000
+        min_leaf_int = max(2, int(min_leaf))
+
+        gbr = GradientBoostingRegressor(
+            n_estimators=n_est, max_depth=3, learning_rate=lr,
+            subsample=subsample, min_samples_leaf=min_leaf_int,
+            max_features="sqrt", loss="huber", alpha=0.9,
+        )
+        pipe = Pipeline([("scaler", StandardScaler()), ("model", gbr)])
+        scores = cross_val_score(pipe, all_X, all_y, cv=5, scoring="neg_mean_absolute_error")
+        return -scores.mean()
+
+    bounds = [
+        (0.005, 0.08),   # learning_rate
+        (0.6, 0.95),     # subsample
+        (3, 15),          # min_samples_leaf
+        (0.0, 1.0),      # n_estimators fraction
+    ]
+
+    result = differential_evolution(
+        objective, bounds, maxiter=15, seed=42, tol=0.001,
+        popsize=8, mutation=(0.5, 1.5), recombination=0.8,
+    )
+    lr, subsample, min_leaf, n_est_frac = result.x
+    print(f"\nOptimized params: lr={lr:.4f}, sub={subsample:.3f}, "
+          f"min_leaf={int(min_leaf)}, n_est={int(500 + n_est_frac * 1500)}, "
+          f"cv_mae={result.fun:.6f}")
+    return {
+        "learning_rate": lr,
+        "subsample": subsample,
+        "min_samples_leaf": max(2, int(min_leaf)),
+        "n_estimators": int(500 + n_est_frac * 1500),
+    }
+
+
 def main():
     train_data, val_data = load_data()
 
@@ -159,6 +244,14 @@ def main():
     train_y = np.array([b["scores"]["overall"] for b in train_data])
     val_X = np.array([encode_fn(b) for b in val_data])
     val_y = np.array([b["scores"]["overall"] for b in val_data])
+
+    # Optional hyperparameter optimization
+    import sys
+    if "--optimize" in sys.argv:
+        print("\n=== Running hyperparameter optimization ===")
+        opt_params = _optimize_hyperparams(train_X, train_y, val_X, val_y)
+        GBR_PARAMS.update(opt_params)
+        print(f"Updated GBR_PARAMS: {GBR_PARAMS}")
 
     # Build pipeline
     steps = []

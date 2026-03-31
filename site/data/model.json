@@ -1,43 +1,54 @@
 {
-  "val_mae": 1.8765,
-  "cv_mae": 1.8331,
-  "train_mae": 1.6782,
-  "training_seconds": 2.8,
-  "num_params": 19440,
+  "val_mae": 1.8401,
+  "cv_mae": 1.8174,
+  "train_mae": 1.5862,
+  "training_seconds": 8.6,
+  "num_params": 45321,
   "weights": [
-    0.24628393990799108,
-    0.06035466732145374,
-    0.1772440049550246,
-    0.07740817713074977,
-    0.025906840375141488,
-    0.027628729437570644,
-    0.001219830420281644,
-    0.015017033446719348,
-    0.03282062021288264,
-    0.0014656775820609165,
-    5.7936506802034295e-05,
-    0.013533979409260573,
-    0.007062157024885918,
-    0.0025576499881264088,
+    0.09932113641884037,
+    0.029739410182764575,
+    0.09461152237566302,
+    0.038105369405369155,
+    0.013655120456924519,
+    0.02221276429423011,
+    0.0003652485604062217,
+    0.004635970612718322,
+    0.02158997533438166,
+    0.0005597471272259902,
+    0.0021089368823967937,
+    0.005364705553339367,
+    0.003105397945236213,
+    0.0032180938153578004,
     0.0,
     0.0,
     0.0,
-    0.015986059222335213,
-    0.02789860027976712,
-    0.012970809590165971,
-    0.0006783391300666745,
-    0.011345557644941853,
+    0.010670087836466793,
+    0.012397725777572146,
+    0.008967318562699882,
+    0.0011581870235676573,
+    0.008942753726412199,
     0.0,
     0.0,
-    0.0506305255975516,
-    0.007261671015247191,
-    0.02922059691453868,
+    0.029739052516166847,
+    0.0021105174666516406,
+    0.010685565774361735,
     0.0,
-    0.017306789776988168,
-    0.07178919001932926,
-    0.06635061709011748,
+    0.011255656736834943,
+    0.036617043662107066,
+    0.04715968376569642,
     0.0,
-    0.0
+    0.0,
+    0.010527517967900326,
+    0.0,
+    0.0,
+    0.09980635898655195,
+    0.04698363114045951,
+    0.02324127530639347,
+    0.0019601533307227604,
+    0.0012309046061148056,
+    0.11340595755752111,
+    0.09339564365689673,
+    0.09115156563404793
   ],
   "bias": 82.088,
   "feature_names": [
@@ -73,7 +84,18 @@
     "drying_method_raised_bed",
     "drying_method_patio",
     "drying_method_mechanical",
-    "anaerobic"
+    "anaerobic",
+    "ferm_capped",
+    "ferm_risk",
+    "premium_anaerobic",
+    "altitude_x_Typica",
+    "altitude_x_Bourbon",
+    "altitude_x_Caturra",
+    "altitude_x_Gesha",
+    "altitude_x_SL28",
+    "altitude_x_latitude",
+    "altitude_x_delta_t",
+    "latitude_x_delta_t"
   ],
   "interaction_terms": [],
   "factor_weights": {
@@ -82,82 +104,84 @@
     "R": 0.0,
     "B": 0.0
   },
-  "model_type": "voting",
+  "model_type": "stacking",
   "version": "v2",
   "config": {
-    "model_type": "voting",
-    "feature_dim": 33,
-    "use_extended_features": false,
+    "model_type": "stacking",
+    "feature_dim": 44,
+    "use_extended_features": true,
     "gbr_params": {
-      "n_estimators": 1000,
+      "n_estimators": 1500,
       "max_depth": 3,
-      "learning_rate": 0.01,
-      "subsample": 0.8,
-      "min_samples_leaf": 5,
-      "max_features": "sqrt"
+      "learning_rate": 0.015,
+      "subsample": 0.85,
+      "min_samples_leaf": 3,
+      "max_features": "sqrt",
+      "loss": "huber",
+      "alpha": 0.9
     },
     "dropped_features": "R (roast) and B (brew) \u2014 constant in CQI data"
   },
   "top_features": [
     {
+      "name": "altitude_x_latitude",
+      "importance": 0.1134
+    },
+    {
+      "name": "altitude_x_Typica",
+      "importance": 0.0998
+    },
+    {
       "name": "altitude_m",
-      "importance": 0.2463
+      "importance": 0.0993
     },
     {
       "name": "latitude",
-      "importance": 0.1772
+      "importance": 0.0946
     },
     {
-      "name": "delta_t_c",
-      "importance": 0.0774
+      "name": "altitude_x_delta_t",
+      "importance": 0.0934
     },
     {
-      "name": "drying_method_raised_bed",
-      "importance": 0.0718
+      "name": "latitude_x_delta_t",
+      "importance": 0.0912
     },
     {
       "name": "drying_method_patio",
-      "importance": 0.0664
+      "importance": 0.0472
+    },
+    {
+      "name": "altitude_x_Bourbon",
+      "importance": 0.047
+    },
+    {
+      "name": "delta_t_c",
+      "importance": 0.0381
+    },
+    {
+      "name": "drying_method_raised_bed",
+      "importance": 0.0366
     },
     {
       "name": "shade_pct",
-      "importance": 0.0604
+      "importance": 0.0297
     },
     {
       "name": "soil_type_volcanic",
-      "importance": 0.0506
+      "importance": 0.0297
     },
     {
-      "name": "variety_Typica",
-      "importance": 0.0328
-    },
-    {
-      "name": "soil_type_loam",
-      "importance": 0.0292
-    },
-    {
-      "name": "method_p_washed",
-      "importance": 0.0279
+      "name": "altitude_x_Caturra",
+      "importance": 0.0232
     },
     {
       "name": "drying_days",
-      "importance": 0.0276
+      "importance": 0.0222
     },
     {
-      "name": "fermentation_hours",
-      "importance": 0.0259
-    },
-    {
-      "name": "soil_type_laterite",
-      "importance": 0.0173
-    },
-    {
-      "name": "variety_Catimor",
-      "importance": 0.016
-    },
-    {
-      "name": "variety_Bourbon",
-      "importance": 0.015
+      "name": "variety_Typica",
+      "importance": 0.0216
     }
   ]
 }

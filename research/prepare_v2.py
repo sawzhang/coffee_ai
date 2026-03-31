@@ -50,11 +50,18 @@ CAT_FIELDS_V2 = {
 
 BOOL_FIELDS_V2 = ["anaerobic"]
 
-# 6 numerical + 12+6+5+3 categorical + 1 boolean = 33
+# Premium varieties (base_q > 8.0 in _VARIETY_PROFILES)
+PREMIUM_VARIETIES = {"Gesha", "74158", "Ethiopian Heirloom", "SL28", "SL34"}
+
+# Engineered feature names
+ENGINEERED_FEATURES = ["ferm_capped", "ferm_risk", "premium_anaerobic"]
+
+# 6 numerical + 26 categorical + 1 boolean + 3 engineered = 36
 FEATURE_DIM_V2 = (
     len(NUM_RANGES_V2)
     + sum(len(v) for v in CAT_FIELDS_V2.values())
     + len(BOOL_FIELDS_V2)
+    + len(ENGINEERED_FEATURES)
 )
 
 
@@ -89,7 +96,15 @@ def encode_factors_v2(bean):
             features.append(1.0 if val == cat else 0.0)
 
     # Boolean
-    features.append(1.0 if bean["P"]["anaerobic"] else 0.0)
+    anaerobic = bean["P"]["anaerobic"]
+    features.append(1.0 if anaerobic else 0.0)
+
+    # Engineered features
+    ferm_h = bean["P"]["fermentation_hours"]
+    variety = bean["G"]["variety"]
+    features.append(min(ferm_h / 120.0, 1.0))  # ferm_capped: saturation at 120h
+    features.append(1.0 if ferm_h > 150 and not anaerobic else 0.0)  # ferm_risk
+    features.append(1.0 if variety in PREMIUM_VARIETIES and anaerobic else 0.0)  # premium_anaerobic
 
     return np.array(features, dtype=np.float64)
 
@@ -102,16 +117,17 @@ def get_feature_names_v2():
             names.append(f"{field}_{cat}")
     for b in BOOL_FIELDS_V2:
         names.append(b)
+    names.extend(ENGINEERED_FEATURES)
     return names
 
 
 # ── V2 Extended Features: interaction terms ──────────────────────────
 
-TOP_VARIETIES_FOR_INTERACTION = ["Typica", "Bourbon", "Caturra"]
+TOP_VARIETIES_FOR_INTERACTION = ["Typica", "Bourbon", "Caturra", "Gesha", "SL28"]
 
 EXTENDED_FEATURE_NAMES = (
     [f"altitude_x_{v}" for v in TOP_VARIETIES_FOR_INTERACTION]
-    + ["altitude_x_latitude"]
+    + ["altitude_x_latitude", "altitude_x_delta_t", "latitude_x_delta_t"]
 )
 
 FEATURE_DIM_V2_EXTENDED = FEATURE_DIM_V2 + len(EXTENDED_FEATURE_NAMES)
@@ -132,11 +148,16 @@ def encode_factors_v2_extended(bean):
     lat_lo, lat_hi = NUM_RANGES_V2["latitude"]
     lat_norm = (abs(bean["G"]["latitude"]) - lat_lo) / (lat_hi - lat_lo)
 
+    dt_lo, dt_hi = NUM_RANGES_V2["delta_t_c"]
+    dt_norm = (bean["G"]["delta_t_c"] - dt_lo) / (dt_hi - dt_lo)
+
     variety = bean["G"]["variety"]
     interactions = []
     for v in TOP_VARIETIES_FOR_INTERACTION:
         interactions.append(alt_norm * (1.0 if variety == v else 0.0))
     interactions.append(alt_norm * lat_norm)
+    interactions.append(alt_norm * dt_norm)
+    interactions.append(lat_norm * dt_norm)
 
     return np.concatenate([base, np.array(interactions, dtype=np.float64)])
 
