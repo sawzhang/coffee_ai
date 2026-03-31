@@ -10,7 +10,18 @@ COPY research/pyproject.toml research/pyproject.toml
 RUN pip install --no-cache-dir hatchling \
     && pip install --no-cache-dir "research/[api]"
 
-# ── Stage 2: Runtime ─────────────────────────────────────────────────
+# ── Stage 2: Model training ─────────────────────────────────────────
+FROM builder AS trainer
+
+WORKDIR /app
+
+# Copy research code and data for training
+COPY research/ research/
+
+# Train model to generate model.joblib and model_quantiles.joblib
+RUN cd research && python3 train_v2.py
+
+# ── Stage 3: Runtime ────────────────────────────────────────────────
 FROM python:3.11-slim
 
 WORKDIR /app
@@ -27,8 +38,9 @@ COPY research/data/beans.json research/data/beans.json
 COPY research/data/schema.json research/data/schema.json
 COPY site/ site/
 
-# Copy model files if they exist (use glob pattern; build won't fail if missing)
-COPY research/model.jobli* research/model.pk* research/
+# Copy trained models from trainer stage
+COPY --from=trainer /app/research/model.joblib research/model.joblib
+COPY --from=trainer /app/research/model_quantiles.joblib research/model_quantiles.joblib
 
 EXPOSE 8000
 

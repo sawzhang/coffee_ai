@@ -11,6 +11,7 @@ research/run.log
 research/*.png
 research/model.pkl
 research/model.joblib
+research/model_quantiles.joblib
 research/experiment_config.json
 
 # OS

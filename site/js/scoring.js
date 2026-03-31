@@ -139,6 +139,28 @@ const CoffeeScorer = {
     // Boolean
     features.push(inputs.anaerobic ? 1.0 : 0.0);
 
+    // Engineered features (from prepare_v2.py)
+    const fermH = inputs.fermentation_hours || 36;
+    const variety = inputs.variety || 'Bourbon';
+    const isAnaerobic = inputs.anaerobic || false;
+    const premiumVarieties = ['Gesha', '74158', 'Ethiopian Heirloom', 'SL28', 'SL34'];
+    features.push(Math.min(fermH / 120.0, 1.0));  // ferm_capped
+    features.push((fermH > 150 && !isAnaerobic) ? 1.0 : 0.0);  // ferm_risk
+    features.push((premiumVarieties.includes(variety) && isAnaerobic) ? 1.0 : 0.0);  // premium_anaerobic
+
+    // Interaction features (from prepare_v2.py extended)
+    // Must match NUM_RANGES_V2 normalization exactly
+    const altNorm = (numSources.altitude_m - 800) / (2400 - 800);
+    const latNorm = (Math.abs(inputs.latitude || 8) - (-25)) / (25 - (-25));
+    const dtNorm = ((inputs.delta_t_c || 12) - 5) / (20 - 5);
+    const interactionVarieties = ['Typica', 'Bourbon', 'Caturra', 'Gesha', 'SL28'];
+    for (const v of interactionVarieties) {
+      features.push(altNorm * (variety === v ? 1.0 : 0.0));
+    }
+    features.push(altNorm * latNorm);    // altitude_x_latitude
+    features.push(altNorm * dtNorm);     // altitude_x_delta_t
+    features.push(latNorm * dtNorm);     // latitude_x_delta_t
+
     return features;
   },
 

@@ -4,4 +4,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - CORS_ORIGINS=http://localhost:8000
+      # For production, set to your actual domain(s):
+      # CORS_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+      - CORS_ORIGINS=http://localhost:8000,http://localhost:8080

@@ -44,3 +44,30 @@ jobs:
           assert mae < 1.95, f'val_mae {mae} exceeds threshold 1.95'
           print(f'Model quality gate PASSED: val_mae={mae:.4f} < 1.95')
           "
+      - name: Upload model artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-models
+          path: |
+            research/model.joblib
+            research/model_quantiles.joblib
+          retention-days: 30
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t coffee-ai:test .
+      - name: Smoke test container
+        run: |
+          docker run -d --name coffee-test -p 8000:8000 coffee-ai:test
+          sleep 5
+          curl -sf http://localhost:8000/api/health | python3 -c "
+          import json, sys
+          data = json.load(sys.stdin)
+          assert data['status'] == 'ok', f'Health check failed: {data}'
+          assert data['model_loaded'], 'Model not loaded in container'
+          print('Docker smoke test PASSED')
+          "
+          docker stop coffee-test
