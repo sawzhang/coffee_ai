@@ -13,6 +13,7 @@ research/model.pkl
 research/model.joblib
 research/model_quantiles.joblib
 research/experiment_config.json
+research/data/brew_logs.json
 
 # OS
 .DS_Store

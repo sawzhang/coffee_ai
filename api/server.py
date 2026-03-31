@@ -30,6 +30,7 @@ from prepare_v2 import (  # noqa: E402
     load_data, FEATURE_DIM_V2, FEATURE_DIM_V2_EXTENDED,
     PROCESS_METHODS,
 )
+from flavor_wheel import predict_flavor_prior, flavor_profile_summary  # noqa: E402
 
 # ── App state (loaded once at startup, read-only thereafter) ─────────
 
@@ -374,11 +375,19 @@ def predict(req: PredictRequest):
     score = predict_single(bean)
     attribution = get_attribution(bean)
 
+    # Predict flavor profile from variety + process
+    variety = req.G.variety
+    process = req.P.method
+    predicted_notes = predict_flavor_prior(variety, process)
+    flavor_summary = flavor_profile_summary(predicted_notes)
+
     result = {
         "score": round(score, 1),
         "grade": score_grade(score),
         "attribution": attribution,
         "feature_dim": FEATURE_DIM_V2,
+        "tasting_notes": predicted_notes,
+        "flavor_profile": flavor_summary,
     }
     interval = predict_interval(bean)
     if interval:
@@ -517,6 +526,96 @@ def experiments():
     if cached is not None:
         return cached
     return []
+
+
+# ── Brew Log Endpoints ───────────────────────────────────────────────
+
+_BREW_LOGS_PATH = RESEARCH_DIR / "data" / "brew_logs.json"
+_GRINDER_PATH = RESEARCH_DIR / "data" / "grinder_calibration.json"
+
+
+class BrewLogEntry(BaseModel):
+    bean: dict = {}
+    equipment: dict = {}
+    recipe: dict = {}
+    water: dict = {}
+    result: dict = {}
+    taste: dict = {}
+
+
+@app.post("/api/brew-log")
+def submit_brew_log(entry: BrewLogEntry):
+    """Submit a brew log entry."""
+    import uuid
+    from datetime import datetime
+
+    log_entry = entry.model_dump()
+    log_entry["id"] = str(uuid.uuid4())[:8]
+    log_entry["timestamp"] = datetime.utcnow().isoformat()
+
+    # Compute ratio if not provided
+    recipe = log_entry.get("recipe", {})
+    if recipe.get("dose_g") and recipe.get("water_g") and not recipe.get("ratio"):
+        recipe["ratio"] = round(recipe["water_g"] / recipe["dose_g"], 1)
+
+    # Load existing logs
+    logs = []
+    if _BREW_LOGS_PATH.exists():
+        with open(_BREW_LOGS_PATH) as f:
+            logs = json.load(f)
+
+    logs.append(log_entry)
+
+    with open(_BREW_LOGS_PATH, "w") as f:
+        json.dump(logs, f, indent=2)
+
+    return {"id": log_entry["id"], "message": "Brew log saved", "total_logs": len(logs)}
+
+
+@app.get("/api/brew-logs")
+def get_brew_logs(limit: int = 50):
+    """Get recent brew logs."""
+    if not _BREW_LOGS_PATH.exists():
+        return {"logs": [], "total": 0}
+    with open(_BREW_LOGS_PATH) as f:
+        logs = json.load(f)
+    return {"logs": logs[-limit:], "total": len(logs)}
+
+
+@app.get("/api/grinders")
+def get_grinders():
+    """Return grinder calibration database."""
+    cached = state.get_cached_json(_GRINDER_PATH)
+    if cached:
+        return cached
+    return {"grinders": {}}
+
+
+@app.get("/api/grinders/{grinder_id}/microns")
+def grind_to_microns(grinder_id: str, setting: float):
+    """Convert a grinder setting to estimated microns."""
+    cached = state.get_cached_json(_GRINDER_PATH)
+    if not cached or grinder_id not in cached.get("grinders", {}):
+        return {"error": f"Unknown grinder: {grinder_id}"}
+
+    cal = cached["grinders"][grinder_id]["clicks_to_microns"]
+    # Linear interpolation between known calibration points
+    settings = sorted((float(k), v) for k, v in cal.items())
+
+    if setting <= settings[0][0]:
+        return {"microns": settings[0][1], "grinder": grinder_id}
+    if setting >= settings[-1][0]:
+        return {"microns": settings[-1][1], "grinder": grinder_id}
+
+    for i in range(len(settings) - 1):
+        s1, m1 = settings[i]
+        s2, m2 = settings[i + 1]
+        if s1 <= setting <= s2:
+            t = (setting - s1) / (s2 - s1)
+            microns = round(m1 + t * (m2 - m1))
+            return {"microns": microns, "grinder": grinder_id}
+
+    return {"error": "Interpolation failed"}
 
 
 # Mount static site

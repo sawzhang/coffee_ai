@@ -135,6 +135,7 @@ const I18n = {
     'fermentation-label': { en: 'fermentation', zh: '发酵' },
     'from-label': { en: 'from', zh: '来自' },
     'ci-prefix': { en: '80% CI: ', zh: '80% 置信区间: ' },
+    'tasting-notes-label': { en: 'Predicted Tasting Notes', zh: '预测风味描述' },
   },
 
   init() {

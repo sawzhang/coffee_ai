@@ -158,6 +158,17 @@
       if (result.attribution) {
         CoffeeCharts.renderAttribution('chart-attribution', result.attribution);
       }
+
+      // Display tasting notes
+      const notesEl = document.getElementById('flavor-notes');
+      if (notesEl && result.tasting_notes) {
+        notesEl.innerHTML = `
+          <div class="notes-label">${I18n.t('tasting-notes-label')}</div>
+          <div class="notes-tags">
+            ${result.tasting_notes.map(n => `<span class="note-tag">${n.replace(/_/g, ' ')}</span>`).join('')}
+          </div>
+        `;
+      }
     }
   }
 

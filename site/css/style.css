@@ -409,6 +409,20 @@ input[type="range"]::-webkit-slider-thumb {
 }
 .footer a:hover { text-decoration: underline; }
 
+/* ── Flavor Notes ────────────────────────────────────── */
+.flavor-notes { margin-top: 1rem; }
+.notes-label { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.4rem; }
+.notes-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.note-tag {
+  background: var(--bg);
+  color: var(--green);
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  border: 1px solid var(--green);
+  opacity: 0.9;
+}
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
   .header-content { padding: 1rem; }

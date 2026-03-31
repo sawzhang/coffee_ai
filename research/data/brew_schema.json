@@ -1,0 +1,78 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Coffee Brew Log",
+  "type": "object",
+  "required": ["bean", "recipe", "taste"],
+  "properties": {
+    "id": { "type": "string" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "bean": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "roaster": { "type": "string" },
+        "variety": { "type": "string" },
+        "origin": { "type": "string" },
+        "process": { "type": "string" },
+        "roast_level": { "type": "string", "enum": ["light", "medium_light", "medium", "medium_dark", "dark"] },
+        "roast_date": { "type": "string", "format": "date" },
+        "days_off_roast": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "equipment": {
+      "type": "object",
+      "properties": {
+        "brewer": { "type": "string", "enum": ["v60_01", "v60_02", "v60_03", "kalita_155", "kalita_185", "chemex_6cup", "chemex_3cup", "aeropress", "french_press", "clever", "origami", "april"] },
+        "grinder": { "type": "string" },
+        "grind_setting": { "type": "number" },
+        "grind_microns": { "type": "number", "minimum": 100, "maximum": 1500 },
+        "filter": { "type": "string", "enum": ["paper_tabbed", "paper_natural", "paper_bleached", "metal", "cloth"] }
+      }
+    },
+    "recipe": {
+      "type": "object",
+      "required": ["dose_g", "water_g", "water_temp_c"],
+      "properties": {
+        "dose_g": { "type": "number", "minimum": 5, "maximum": 50 },
+        "water_g": { "type": "number", "minimum": 50, "maximum": 1000 },
+        "ratio": { "type": "number" },
+        "water_temp_c": { "type": "number", "minimum": 70, "maximum": 100 },
+        "bloom_time_s": { "type": "integer" },
+        "bloom_water_g": { "type": "number" },
+        "total_time_s": { "type": "integer" },
+        "pours": { "type": "integer" },
+        "technique": { "type": "string", "enum": ["continuous", "pulse", "rao_spin", "4_6_method", "osmotic", "bypass"] }
+      }
+    },
+    "water": {
+      "type": "object",
+      "properties": {
+        "tds_ppm": { "type": "number" },
+        "recipe": { "type": "string" },
+        "gh_ppm": { "type": "number" },
+        "kh_ppm": { "type": "number" }
+      }
+    },
+    "result": {
+      "type": "object",
+      "properties": {
+        "drawdown_time_s": { "type": "integer" },
+        "tds_out": { "type": "number" },
+        "extraction_yield_pct": { "type": "number" }
+      }
+    },
+    "taste": {
+      "type": "object",
+      "required": ["overall"],
+      "properties": {
+        "overall": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "acidity": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "sweetness": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "bitterness": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "body": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "balance": { "type": "string", "enum": ["under_extracted", "slightly_under", "balanced", "slightly_over", "over_extracted"] },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

@@ -117,7 +117,11 @@ const CoffeeScorer = {
       attribution[k] = attribution[k] / attrSum;
     }
 
-    return { score, grade, attribution, local: true };
+    const varietyNotes = this._varietyFlavors[inputs.variety] || ['sweet'];
+    const processNotes = this._processFlavors[inputs.method_p] || [];
+    const tasting_notes = [...new Set([...varietyNotes, ...processNotes])];
+
+    return { score, grade, attribution, tasting_notes, local: true };
   },
 
   /**
@@ -225,6 +229,29 @@ const CoffeeScorer = {
       console.warn('Explore API error:', e);
       return null;
     }
+  },
+
+  _varietyFlavors: {
+    'Gesha': ['jasmine', 'bergamot', 'peach', 'honey'],
+    'Ethiopian Heirloom': ['blueberry', 'jasmine', 'honey'],
+    '74158': ['jasmine', 'peach', 'lemon', 'honey'],
+    'SL28': ['blackberry', 'grapefruit', 'brown sugar'],
+    'SL34': ['plum', 'brown sugar'],
+    'Bourbon': ['caramel', 'brown sugar', 'apple', 'chocolate'],
+    'Typica': ['chocolate', 'almond', 'sweet'],
+    'Caturra': ['caramel', 'citrus'],
+    'Pacamara': ['dark chocolate', 'orange'],
+    'Catuai': ['brown sugar', 'almond'],
+    'Castillo': ['caramel', 'nutty'],
+    'Catimor': ['earthy', 'grain'],
+  },
+  _processFlavors: {
+    'washed': ['clean', 'bright'],
+    'natural': ['strawberry', 'winey'],
+    'honey_yellow': ['honey', 'sweet'],
+    'honey_red': ['cherry', 'brown sugar'],
+    'honey_black': ['raisin', 'winey'],
+    'wet_hulled': ['earthy', 'woody'],
   },
 
   _buildRequest(inputs) {
