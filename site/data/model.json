@@ -1,41 +1,41 @@
 {
-  "val_mae": 1.8802,
-  "cv_mae": 1.8404,
-  "train_mae": 1.6781,
-  "training_seconds": 1.0,
-  "num_params": 12628,
+  "val_mae": 1.8765,
+  "cv_mae": 1.8331,
+  "train_mae": 1.6782,
+  "training_seconds": 2.8,
+  "num_params": 19440,
   "weights": [
-    0.24675572904675774,
-    0.05478270590818129,
-    0.20007571372597133,
-    0.07781596284387934,
-    0.02578640698020068,
-    0.03628018632606584,
-    0.0008607474165458429,
-    0.01057135584162501,
-    0.036813569752620255,
-    0.001322703608227471,
-    0.00017874789315220127,
-    0.01449705971577606,
-    0.0078885106887801,
-    0.0021507603397401117,
+    0.24628393990799108,
+    0.06035466732145374,
+    0.1772440049550246,
+    0.07740817713074977,
+    0.025906840375141488,
+    0.027628729437570644,
+    0.001219830420281644,
+    0.015017033446719348,
+    0.03282062021288264,
+    0.0014656775820609165,
+    5.7936506802034295e-05,
+    0.013533979409260573,
+    0.007062157024885918,
+    0.0025576499881264088,
     0.0,
     0.0,
     0.0,
-    0.01593322347960405,
-    0.023110913409611012,
-    0.012720530986380705,
-    0.0005268176943711365,
-    0.01050510205656992,
+    0.015986059222335213,
+    0.02789860027976712,
+    0.012970809590165971,
+    0.0006783391300666745,
+    0.011345557644941853,
     0.0,
     0.0,
-    0.044402320458371676,
-    0.008359204347857871,
-    0.034129183556042185,
+    0.0506305255975516,
+    0.007261671015247191,
+    0.02922059691453868,
     0.0,
-    0.016211758211430168,
-    0.05966829757676669,
-    0.05865248813547135,
+    0.017306789776988168,
+    0.07178919001932926,
+    0.06635061709011748,
     0.0,
     0.0
   ],
@@ -82,11 +82,12 @@
     "R": 0.0,
     "B": 0.0
   },
-  "model_type": "gbr",
+  "model_type": "voting",
   "version": "v2",
   "config": {
-    "model_type": "gbr",
+    "model_type": "voting",
     "feature_dim": 33,
+    "use_extended_features": false,
     "gbr_params": {
       "n_estimators": 1000,
       "max_depth": 3,
@@ -100,63 +101,63 @@
   "top_features": [
     {
       "name": "altitude_m",
-      "importance": 0.2468
+      "importance": 0.2463
     },
     {
       "name": "latitude",
-      "importance": 0.2001
+      "importance": 0.1772
     },
     {
       "name": "delta_t_c",
-      "importance": 0.0778
+      "importance": 0.0774
     },
     {
       "name": "drying_method_raised_bed",
-      "importance": 0.0597
+      "importance": 0.0718
     },
     {
       "name": "drying_method_patio",
-      "importance": 0.0587
+      "importance": 0.0664
     },
     {
       "name": "shade_pct",
-      "importance": 0.0548
+      "importance": 0.0604
     },
     {
       "name": "soil_type_volcanic",
-      "importance": 0.0444
+      "importance": 0.0506
     },
     {
       "name": "variety_Typica",
-      "importance": 0.0368
-    },
-    {
-      "name": "drying_days",
-      "importance": 0.0363
+      "importance": 0.0328
     },
     {
       "name": "soil_type_loam",
-      "importance": 0.0341
-    },
-    {
-      "name": "fermentation_hours",
-      "importance": 0.0258
+      "importance": 0.0292
     },
     {
       "name": "method_p_washed",
-      "importance": 0.0231
+      "importance": 0.0279
+    },
+    {
+      "name": "drying_days",
+      "importance": 0.0276
+    },
+    {
+      "name": "fermentation_hours",
+      "importance": 0.0259
     },
     {
       "name": "soil_type_laterite",
-      "importance": 0.0162
+      "importance": 0.0173
     },
     {
       "name": "variety_Catimor",
-      "importance": 0.0159
+      "importance": 0.016
     },
     {
-      "name": "variety_Caturra",
-      "importance": 0.0145
+      "name": "variety_Bourbon",
+      "importance": 0.015
     }
   ]
 }

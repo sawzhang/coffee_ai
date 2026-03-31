@@ -1,9 +1,12 @@
 /**
- * Coffee Attribution AutoResearch — Main Application (API-backed)
+ * Coffee Attribution AutoResearch — Main Application (API-backed with local fallback)
  */
 
 (async function () {
   'use strict';
+
+  // ── Initialize i18n ───────────────────────────────────
+  I18n.init();
 
   CoffeeCharts.defaults();
 
@@ -45,7 +48,12 @@
     renderBeanGrid('bean-grid', beansSummary.top_beans);
   }
 
-  // ── Interactive Scorer (API-backed) ────────────────────
+  // ── Score Distribution ─────────────────────────────────
+  if (beansSummary) {
+    CoffeeCharts.renderDistribution('chart-distribution', beansSummary);
+  }
+
+  // ── Interactive Scorer (API-backed with local fallback) ─
   const rangeBindings = [
     ['input-altitude', 'val-altitude'],
     ['input-shade', 'val-shade'],
@@ -123,7 +131,10 @@
 
     if (result) {
       document.getElementById('predicted-score').textContent = result.score.toFixed(1);
-      document.getElementById('predicted-grade').textContent = result.grade;
+      const gradeText = (typeof I18n !== 'undefined')
+        ? I18n.grade(result.score)
+        : result.grade;
+      document.getElementById('predicted-grade').textContent = gradeText;
 
       if (result.attribution) {
         CoffeeCharts.renderAttribution('chart-attribution', result.attribution);
@@ -150,12 +161,12 @@
         delta_t_c: inputs.delta_t_c,
       };
 
-      exploreBtn.textContent = 'Exploring...';
+      exploreBtn.textContent = I18n.t('btn-explore-loading');
       exploreBtn.disabled = true;
 
       const result = await CoffeeScorer.explore(gFactors);
 
-      exploreBtn.textContent = 'Explore Combinations';
+      exploreBtn.textContent = I18n.t('btn-explore');
       exploreBtn.disabled = false;
 
       if (result && result.results) {

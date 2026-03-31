@@ -35,6 +35,19 @@ class _AppState:
     model = None
     beans_all: list = []
     feature_names: list = []
+    _json_cache: dict = {}
+
+    @classmethod
+    def get_cached_json(cls, path: Path) -> dict | list | None:
+        """Load a JSON file once and return cached content on subsequent calls."""
+        key = str(path)
+        if key not in cls._json_cache:
+            if path.exists():
+                with open(path) as f:
+                    cls._json_cache[key] = json.load(f)
+            else:
+                return None
+        return cls._json_cache[key]
 
 
 state = _AppState()
@@ -257,6 +270,16 @@ def match_user_prefs(bean: dict, prefs: UserPrefs) -> float:
 
 # ── Endpoints ─────────────────────────────────────────────────────────
 
+@app.get("/api/version")
+def version():
+    return {
+        "api_version": app.version,
+        "model_loaded": state.model is not None,
+        "feature_dim": FEATURE_DIM_V2,
+        "python_version": sys.version,
+    }
+
+
 @app.get("/api/health")
 def health():
     return {
@@ -359,9 +382,9 @@ def explore(req: ExploreRequest):
 def model_info():
     """Return current model metadata."""
     model_json = Path(__file__).parent.parent / "site" / "data" / "model.json"
-    if model_json.exists():
-        with open(model_json) as f:
-            return json.load(f)
+    cached = state.get_cached_json(model_json)
+    if cached is not None:
+        return cached
     return {"error": "model.json not found"}
 
 
@@ -369,9 +392,9 @@ def model_info():
 def beans_summary():
     """Return dataset summary."""
     summary_path = Path(__file__).parent.parent / "site" / "data" / "beans_summary.json"
-    if summary_path.exists():
-        with open(summary_path) as f:
-            return json.load(f)
+    cached = state.get_cached_json(summary_path)
+    if cached is not None:
+        return cached
     return {"error": "beans_summary.json not found"}
 
 
@@ -379,9 +402,9 @@ def beans_summary():
 def experiments():
     """Return experiment history."""
     results_path = Path(__file__).parent.parent / "site" / "data" / "results.json"
-    if results_path.exists():
-        with open(results_path) as f:
-            return json.load(f)
+    cached = state.get_cached_json(results_path)
+    if cached is not None:
+        return cached
     return []
 
 

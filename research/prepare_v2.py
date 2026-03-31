@@ -105,6 +105,47 @@ def get_feature_names_v2():
     return names
 
 
+# ── V2 Extended Features: interaction terms ──────────────────────────
+
+TOP_VARIETIES_FOR_INTERACTION = ["Typica", "Bourbon", "Caturra"]
+
+EXTENDED_FEATURE_NAMES = (
+    [f"altitude_x_{v}" for v in TOP_VARIETIES_FOR_INTERACTION]
+    + ["altitude_x_latitude"]
+)
+
+FEATURE_DIM_V2_EXTENDED = FEATURE_DIM_V2 + len(EXTENDED_FEATURE_NAMES)
+
+
+def encode_factors_v2_extended(bean):
+    """Encode G + P features plus interaction terms.
+
+    Extra features (4):
+      - altitude_m_norm * variety_onehot for Typica, Bourbon, Caturra
+      - altitude_m_norm * abs(latitude_norm)
+    """
+    base = encode_factors_v2(bean)
+
+    alt_lo, alt_hi = NUM_RANGES_V2["altitude_m"]
+    alt_norm = (bean["G"]["altitude_m"] - alt_lo) / (alt_hi - alt_lo)
+
+    lat_lo, lat_hi = NUM_RANGES_V2["latitude"]
+    lat_norm = (abs(bean["G"]["latitude"]) - lat_lo) / (lat_hi - lat_lo)
+
+    variety = bean["G"]["variety"]
+    interactions = []
+    for v in TOP_VARIETIES_FOR_INTERACTION:
+        interactions.append(alt_norm * (1.0 if variety == v else 0.0))
+    interactions.append(alt_norm * lat_norm)
+
+    return np.concatenate([base, np.array(interactions, dtype=np.float64)])
+
+
+def get_feature_names_v2_extended():
+    """Return ordered feature names for V2 extended encoding."""
+    return get_feature_names_v2() + EXTENDED_FEATURE_NAMES
+
+
 def load_data(path="data/beans.json", seed=42):
     """Delegate to original load_data."""
     return _load_data(path, seed)
@@ -119,9 +160,14 @@ def evaluate_model_v2(predict_fn, val_data):
 assert FEATURE_DIM_V2 == len(get_feature_names_v2()), \
     f"Dim mismatch: {FEATURE_DIM_V2} vs {len(get_feature_names_v2())}"
 
+assert FEATURE_DIM_V2_EXTENDED == len(get_feature_names_v2_extended()), \
+    f"Extended dim mismatch: {FEATURE_DIM_V2_EXTENDED} vs {len(get_feature_names_v2_extended())}"
+
 if __name__ == "__main__":
     print(f"V2 Feature Dimension: {FEATURE_DIM_V2}")
+    print(f"V2 Extended Feature Dimension: {FEATURE_DIM_V2_EXTENDED}")
     print(f"Features: {get_feature_names_v2()}")
+    print(f"Extended features: {EXTENDED_FEATURE_NAMES}")
     print(f"\nDropped from V1 (52 → {FEATURE_DIM_V2}):")
     print("  - R factors: roast_level(4), first_crack_temp_c, drop_temp_c, dtr_pct, total_time_s")
     print("  - B factors: method_b(6), grind_microns, water_temp_c, ratio, brew_time_s, water_tds_ppm")

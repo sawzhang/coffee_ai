@@ -337,6 +337,48 @@ input[type="range"]::-webkit-slider-thumb {
   color: var(--green);
 }
 
+/* ── Disabled R/B Input Groups ─────────────────────────── */
+.input-group-disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  position: relative;
+}
+.rb-note {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  background: rgba(154, 141, 127, 0.06);
+  border-radius: 6px;
+  border-left: 2px solid var(--border);
+}
+
+/* ── Language Toggle ──────────────────────────────────── */
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  position: relative;
+}
+.lang-toggle {
+  position: absolute;
+  right: 0;
+  background: var(--bg-input);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.lang-toggle:hover {
+  background: var(--border);
+}
+
 .empty-state {
   text-align: center;
   padding: 2rem;
