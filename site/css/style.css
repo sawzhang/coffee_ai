@@ -408,3 +408,22 @@ input[type="range"]::-webkit-slider-thumb {
   text-decoration: none;
 }
 .footer a:hover { text-decoration: underline; }
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .header-content { padding: 1rem; }
+  .container { padding: 0 0.5rem; }
+  .card { padding: 1rem; }
+  .input-group { padding: 0.8rem; }
+  .bean-grid { grid-template-columns: 1fr; }
+  .explore-grid { grid-template-columns: 1fr 1fr; }
+  .pref-grid { grid-template-columns: 1fr; }
+  .badges { flex-wrap: wrap; gap: 0.3rem; }
+  .chart-wrap { min-height: 200px; }
+}
+
+@media (max-width: 480px) {
+  .explore-grid { grid-template-columns: 1fr; }
+  h1 { font-size: 1.3rem; }
+  .score-value { font-size: 2.5rem; }
+}

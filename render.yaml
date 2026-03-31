@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: coffee-ai-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: CORS_ORIGINS
+        value: "https://sawzhang.github.io,http://localhost:8080,http://localhost:8000"
+    healthCheckPath: /api/health

@@ -39,6 +39,7 @@ class _AppState:
     quantile_models: dict = {}  # {"low": Pipeline, "high": Pipeline}
     beans_all: list = []
     feature_names: list = []
+    bean_predictions: list = []  # pre-computed predictions for all beans
     _json_cache: dict = {}
 
     @classmethod
@@ -93,17 +94,53 @@ def _load_beans():
     print(f"Loaded {len(state.beans_all)} beans")
 
 
+def _precompute_predictions():
+    """Pre-compute predictions for all beans at startup for fast recommendations."""
+    if not state.model or not state.beans_all:
+        return
+    import time
+    start = time.time()
+    for bean in state.beans_all:
+        score = predict_single(bean)
+        state.bean_predictions.append(score)
+    elapsed = time.time() - start
+    print(f"Pre-computed {len(state.bean_predictions)} predictions in {elapsed:.1f}s")
+
+
 @asynccontextmanager
 async def lifespan(app):
     _load_model()
     _load_beans()
+    _precompute_predictions()
     yield
 
 
 app = FastAPI(title="Coffee Attribution API", version="2.0", lifespan=lifespan)
 
+# ── Logging middleware ────────────────────────────────────────────────
+import logging
+import time as _time
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='{"time":"%(asctime)s","level":"%(levelname)s","msg":"%(message)s"}',
+)
+logger = logging.getLogger("coffee_api")
+
+
+@app.middleware("http")
+async def log_requests(request, call_next):
+    start = _time.time()
+    response = await call_next(request)
+    elapsed_ms = (_time.time() - start) * 1000
+    if request.url.path.startswith("/api/"):
+        logger.info(f"{request.method} {request.url.path} {response.status_code} {elapsed_ms:.0f}ms")
+    return response
+
+
 ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ORIGINS", "http://localhost:8080,http://localhost:8000"
+    "CORS_ORIGINS",
+    "http://localhost:8080,http://localhost:8000,https://sawzhang.github.io"
 ).split(",")
 
 app.add_middleware(
@@ -385,8 +422,9 @@ def recommend(req: RecommendRequest):
         return {"beans": [], "message": "No beans loaded"}
 
     scored = []
-    for bean in state.beans_all:
-        pred_score = predict_single(bean)
+    for i, bean in enumerate(state.beans_all):
+        # Use pre-computed prediction if available, else compute on the fly
+        pred_score = state.bean_predictions[i] if i < len(state.bean_predictions) else predict_single(bean)
         pref_match = match_user_prefs(bean, req.prefs)
         # Normalize both to 0-1 before blending (pred_score range: 60-100)
         quality_norm = (pred_score - 60) / 40

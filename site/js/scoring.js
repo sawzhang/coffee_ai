@@ -5,7 +5,31 @@
  */
 
 const CoffeeScorer = {
+  // Auto-detect API: use local if available, otherwise try remote Render deployment
   API_BASE: '/api',
+  _remoteBase: 'https://coffee-ai-api.onrender.com/api',
+  _apiChecked: false,
+  _useRemote: false,
+
+  async _ensureApi() {
+    if (this._apiChecked) return;
+    this._apiChecked = true;
+    try {
+      const resp = await fetch('/api/health', { signal: AbortSignal.timeout(2000) });
+      if (resp.ok) return; // local API works
+    } catch (e) { /* local not available */ }
+    // Try remote
+    try {
+      const resp = await fetch(this._remoteBase.replace('/api', '/api/health'), { signal: AbortSignal.timeout(5000) });
+      if (resp.ok) {
+        this._useRemote = true;
+        this.API_BASE = this._remoteBase;
+        console.log('Using remote API:', this._remoteBase);
+      }
+    } catch (e) {
+      console.log('No API available, using local fallback');
+    }
+  },
 
   // V2 normalization ranges (from prepare_v2.py)
   _numRanges: {
@@ -27,6 +51,7 @@ const CoffeeScorer = {
   _dryingMethods: ["raised_bed", "patio", "mechanical"],
 
   async predict(inputs) {
+    await this._ensureApi();
     const body = this._buildRequest(inputs);
     try {
       const resp = await fetch(`${this.API_BASE}/predict`, {
@@ -165,6 +190,7 @@ const CoffeeScorer = {
   },
 
   async recommend(prefs, topK = 10) {
+    await this._ensureApi();
     try {
       const resp = await fetch(`${this.API_BASE}/recommend`, {
         method: 'POST',
@@ -180,6 +206,7 @@ const CoffeeScorer = {
   },
 
   async explore(gFactors, options = {}) {
+    await this._ensureApi();
     const body = {
       G: gFactors,
       vary_methods: options.methods || ['washed', 'natural', 'honey_yellow', 'honey_red'],

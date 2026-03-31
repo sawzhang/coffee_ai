@@ -59,6 +59,7 @@
     ['input-shade', 'val-shade'],
     ['input-delta-t', 'val-delta-t'],
     ['input-ferm', 'val-ferm'],
+    ['input-drying-days', 'val-drying-days'],
     ['input-dtr', 'val-dtr'],
     ['input-drop-temp', 'val-drop-temp'],
     ['input-water-temp', 'val-water-temp'],
@@ -102,6 +103,9 @@
     'Ethiopia': 8, 'Kenya': 0, 'Panama': 9, 'Colombia': 5,
     'Guatemala': 15, 'Costa Rica': 10, 'Brazil': -18,
     'Indonesia': -2, 'Yemen': 15, 'China': 22,
+    'Rwanda': -2, 'Burundi': -3, 'El Salvador': 14,
+    'Honduras': 15, 'Mexico': 19, 'Peru': -10, 'Tanzania': -6,
+    'India': 12, 'Papua New Guinea': -6, 'Hawaii': 20,
   };
 
   function getInputs() {
@@ -116,7 +120,7 @@
       anaerobic: val('input-anaerobic') === 'true',
       fermentation_hours: num('input-ferm'),
       drying_method: val('input-drying'),
-      drying_days: 14,
+      drying_days: num('input-drying-days') || 14,
       roast_level: val('input-roast'),
       first_crack_temp_c: 198,
       drop_temp_c: num('input-drop-temp'),
