@@ -3,12 +3,10 @@ FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Copy dependency definition first for layer caching
-COPY research/pyproject.toml research/pyproject.toml
-
-# Install build deps and project deps
-RUN pip install --no-cache-dir hatchling \
-    && pip install --no-cache-dir "research/[api]"
+# Install all dependencies directly (more reliable than pyproject.toml extras)
+RUN pip install --no-cache-dir \
+    numpy scipy scikit-learn pandas matplotlib joblib \
+    fastapi uvicorn pydantic
 
 # ── Stage 2: Model training ─────────────────────────────────────────
 FROM builder AS trainer
