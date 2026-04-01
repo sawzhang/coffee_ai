@@ -1,8 +1,10 @@
 """Validate beans.json data quality and schema consistency."""
 import json
 import sys
-import numpy as np
 from pathlib import Path
+
+import numpy as np
+
 
 def main():
     data_dir = Path(__file__).parent / "data"
@@ -57,7 +59,7 @@ def main():
 
     # Check encoding roundtrip
     sys.path.insert(0, str(Path(__file__).parent))
-    from prepare_v2 import encode_factors_v2, FEATURE_DIM_V2
+    from prepare_v2 import FEATURE_DIM_V2, encode_factors_v2
 
     for bean in beans[:10]:
         features = encode_factors_v2(bean)

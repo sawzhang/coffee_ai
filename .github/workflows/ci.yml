@@ -73,7 +73,13 @@ jobs:
       - name: Smoke test container
         run: |
           docker run -d --name coffee-test -p 8000:8000 coffee-ai:test
-          sleep 5
+          for i in $(seq 1 12); do
+            if curl -sf http://localhost:8000/api/health > /dev/null 2>&1; then
+              echo "Container ready after ${i}s"
+              break
+            fi
+            sleep 5
+          done
           curl -sf http://localhost:8000/api/health | python3 -c "
           import json, sys
           data = json.load(sys.stdin)

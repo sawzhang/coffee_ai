@@ -15,10 +15,10 @@ Feature count: 28 (down from 52)
 Actually, let me compute it properly below.
 """
 
-import json
 import numpy as np
-from pathlib import Path
-from prepare import load_data as _load_data, evaluate_model, TIME_BUDGET
+
+from prepare import evaluate_model
+from prepare import load_data as _load_data
 
 # ── V2 Constants: G + P features only ─────────────────────────────────
 

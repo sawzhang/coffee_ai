@@ -148,11 +148,11 @@ def predict_flavor_prior(variety: str, process: str) -> list[str]:
 if __name__ == "__main__":
     print(f"SCA Flavor Wheel: {NUM_DESCRIPTORS} descriptors")
     print(f"L1 categories: {list(FLAVOR_WHEEL.keys())}")
-    print(f"\nExample — Gesha washed:")
+    print("\nExample — Gesha washed:")
     notes = predict_flavor_prior("Gesha", "washed")
     print(f"  Notes: {notes}")
     print(f"  Profile: {flavor_profile_summary(notes)}")
-    print(f"\nExample — Ethiopian Heirloom natural:")
+    print("\nExample — Ethiopian Heirloom natural:")
     notes = predict_flavor_prior("Ethiopian Heirloom", "natural")
     print(f"  Notes: {notes}")
     print(f"  Profile: {flavor_profile_summary(notes)}")

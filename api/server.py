@@ -9,9 +9,11 @@ Run: uvicorn api.server:app --reload --port 8000
 """
 from __future__ import annotations
 
+import logging
 import os
 import sys
 import json
+import time as _time
 import numpy as np
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -27,8 +29,7 @@ sys.path.insert(0, str(RESEARCH_DIR))
 from prepare_v2 import (  # noqa: E402
     encode_factors_v2, encode_factors_v2_extended,
     get_feature_names_v2, get_feature_names_v2_extended,
-    load_data, FEATURE_DIM_V2, FEATURE_DIM_V2_EXTENDED,
-    PROCESS_METHODS,
+    load_data, FEATURE_DIM_V2, PROCESS_METHODS,
 )
 from flavor_wheel import predict_flavor_prior, flavor_profile_summary  # noqa: E402
 
@@ -119,9 +120,6 @@ async def lifespan(app):
 app = FastAPI(title="Coffee Attribution API", version="2.0", lifespan=lifespan)
 
 # ── Logging middleware ────────────────────────────────────────────────
-import logging
-import time as _time
-
 logging.basicConfig(
     level=logging.INFO,
     format='{"time":"%(asctime)s","level":"%(levelname)s","msg":"%(message)s"}',
