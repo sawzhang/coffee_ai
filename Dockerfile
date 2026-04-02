@@ -33,8 +33,11 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY api/ api/
 COPY research/prepare_v2.py research/prepare_v2.py
 COPY research/prepare.py research/prepare.py
+COPY research/flavor_wheel.py research/flavor_wheel.py
 COPY research/data/beans.json research/data/beans.json
 COPY research/data/schema.json research/data/schema.json
+COPY research/data/grinder_calibration.json research/data/grinder_calibration.json
+COPY research/data/brew_schema.json research/data/brew_schema.json
 COPY site/ site/
 
 # Copy trained models from trainer stage
